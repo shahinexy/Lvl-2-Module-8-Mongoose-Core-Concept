@@ -34,4 +34,4 @@ const studentSchema = new Schema<Student>({
 });
 
 // Model
-const Student = model<Student>('Student', studentSchema)
+export const StudentModle = model<Student>('Student', studentSchema)
