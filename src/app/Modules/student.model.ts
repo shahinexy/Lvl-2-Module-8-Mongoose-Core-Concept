@@ -1,4 +1,4 @@
-import { Schema, model, connect } from 'mongoose';
+import { Schema, model } from 'mongoose';
 import { Gurdian, Student, UserName } from './student/student.interface';
 
 // Sub Schema
