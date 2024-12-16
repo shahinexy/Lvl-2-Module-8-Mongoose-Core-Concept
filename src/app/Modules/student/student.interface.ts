@@ -1,5 +1,13 @@
 import { Schema, model, connect } from 'mongoose';
 
+// Sub Interface
+export type UserName = {
+  firstName: string;
+  middleName: string;
+  lastName: string;
+};
+
+// Sub Interface
 export type Gurdian = {
   fatherName: string;
   fatherOccupation: string;
@@ -9,12 +17,7 @@ export type Gurdian = {
   motherContactNo: string;
 };
 
-export type UserName = {
-  firstName: string;
-  middleName: string;
-  lastName: string;
-};
-
+// Main Interface
 export type Student = {
   id: string;
   name: UserName;
