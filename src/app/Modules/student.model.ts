@@ -3,9 +3,22 @@ import { Gurdian, Student, UserName } from './student/student.interface';
 
 // Sub Schema
 const userNameSchema = new Schema<UserName>({
-  firstName: { type: String, required: [true, 'First name is requird'] },
-  middleName: { type: String },
-  lastName: { type: String, required: true },
+  firstName: {
+    type: String,
+    required: [true, 'First name is requird'],
+    maxlength: [20, 'First Name cna not be grathre then 20'],
+    trim: true,
+    // custom validation
+    validate: {
+      validator: function(value: string){
+        const firstNameStr = value[0].toUpperCase() + value.slice(1).toLowerCase();
+        return firstNameStr === value
+      },
+      message: '{VALUE} is not capitalize format'
+    }
+  },
+  middleName: { type: String, trim: true },
+  lastName: { type: String, required: true, trim: true },
 });
 
 // Sub Schema
@@ -29,9 +42,9 @@ const studentSchema = new Schema<Student>({
     type: String,
     enum: {
       values: ['female', 'male'],
-      message: '{VALUE} is not supported'
+      message: '{VALUE} is not supported',
     },
-    required: true
+    required: true,
   },
   dateOfBirth: { type: String },
   email: { type: String, required: true, unique: true },
@@ -43,15 +56,15 @@ const studentSchema = new Schema<Student>({
   address: { type: String, required: true },
   gurdian: {
     type: gurdianSchema,
-    required: true
+    required: true,
   },
   profileImg: { type: String },
   isActive: {
     type: String,
     enum: ['active', 'blocked'],
-    default: 'active'
+    default: 'active',
   },
 });
 
 // Model
-export const StudentModle = model<Student>('Student', studentSchema)
+export const StudentModle = model<Student>('Student', studentSchema);
