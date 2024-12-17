@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose';
 import { Gurdian, Student, UserName } from './student/student.interface';
+import validator from 'validator';
 
 // Sub Schema
 const userNameSchema = new Schema<UserName>({
@@ -18,7 +19,12 @@ const userNameSchema = new Schema<UserName>({
     }
   },
   middleName: { type: String, trim: true },
-  lastName: { type: String, required: true, trim: true },
+  lastName: { type: String, required: true, trim: true,
+    validate: {
+      validator: (value: string) => validator.isAlpha(value),
+      message: '{VALUE} is not valid'
+    }
+   },
 });
 
 // Sub Schema
@@ -47,7 +53,12 @@ const studentSchema = new Schema<Student>({
     required: true,
   },
   dateOfBirth: { type: String },
-  email: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true,
+    validate: {
+      validator: (value: string) => validator.isEmail(value),
+      message: '{VALUE} is not a valid email' 
+    }
+   },
   contactNo: { type: String },
   bloodGroup: {
     type: String,
