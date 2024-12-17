@@ -3,7 +3,7 @@ import { Schema, model, connect } from 'mongoose';
 // Sub Interface
 export type UserName = {
   firstName: string;
-  middleName: string;
+  middleName?: string;
   lastName: string;
 };
 
