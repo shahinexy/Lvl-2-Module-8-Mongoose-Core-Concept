@@ -9,4 +9,6 @@ router.post('/create-student', StudentController.createStudent)
 
 router.get('/', StudentController.getAllStudents)
 
+router.get('/:studentId', StudentController.getStudent)
+
 export const StudentRouters = router;

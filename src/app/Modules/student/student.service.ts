@@ -12,7 +12,13 @@ const getAllStudentsFronDB = async ()=>{
     return res;
 }
 
+const getSingleStudentFromDB = async (id: string)=>{
+    const result = await StudentModle.findOne({id})
+    return result;
+}
+
 export const  StudentServices = {
     createStudentIntoDB,
-    getAllStudentsFronDB
+    getAllStudentsFronDB,
+    getSingleStudentFromDB,
 }
