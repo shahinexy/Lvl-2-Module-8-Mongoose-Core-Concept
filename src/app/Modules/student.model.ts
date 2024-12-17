@@ -3,7 +3,7 @@ import { Gurdian, Student, UserName } from './student/student.interface';
 
 // Sub Schema
 const userNameSchema = new Schema<UserName>({
-  firstName: { type: String, required: true },
+  firstName: { type: String, required: [true, 'First name is requird'] },
   middleName: { type: String },
   lastName: { type: String, required: true },
 });
@@ -20,17 +20,37 @@ const gurdianSchema = new Schema<Gurdian>({
 
 // Main Schema
 const studentSchema = new Schema<Student>({
-  id: { type: String },
-  name: userNameSchema,
-  gender: ['female', 'male'],
+  id: { type: String, required: true, unique: true },
+  name: {
+    type: userNameSchema,
+    required: true,
+  },
+  gender: {
+    type: String,
+    enum: {
+      values: ['female', 'male'],
+      message: '{VALUE} is not supported'
+    },
+    required: true
+  },
   dateOfBirth: { type: String },
-  email: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
   contactNo: { type: String },
-  bloodGroup: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+  bloodGroup: {
+    type: String,
+    enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+  },
   address: { type: String, required: true },
-  gurdian: gurdianSchema,
+  gurdian: {
+    type: gurdianSchema,
+    required: true
+  },
   profileImg: { type: String },
-  isActive: ['active', 'blocked'],
+  isActive: {
+    type: String,
+    enum: ['active', 'blocked'],
+    default: 'active'
+  },
 });
 
 // Model
