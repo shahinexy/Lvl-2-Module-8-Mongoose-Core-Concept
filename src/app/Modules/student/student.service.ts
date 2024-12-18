@@ -33,7 +33,11 @@ const getAllStudentsFronDB = async ()=>{
 }
 
 const getSingleStudentFromDB = async (id: string)=>{
-    const result = await StudentModle.findOne({id})
+    // const result = await StudentModle.findOne({id})
+
+    const result = await StudentModle.aggregate([
+        {$match: {id: id}}
+    ])
     return result;
 }
 
