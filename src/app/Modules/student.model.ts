@@ -90,6 +90,10 @@ const studentSchema = new Schema<Student, ModelOfStudent>({
     enum: ['active', 'blocked'],
     default: 'active',
   },
+  isDeleted: {
+    type: Boolean,
+    default: false
+  }
 });
 
 // Middleware 
@@ -105,12 +109,15 @@ studentSchema.post('save', function(doc, next) {
   next()
 });
 
+studentSchema.pre('find', function(next){
+  this.find({isDeleted : {$ne : true}})
+  next()
+})
 
-
-
-
-
-
+studentSchema.pre('findOne', function(next){
+  this.find({isDeleted : {$ne : true}})
+  next()
+})
 
 
 // Create a custom instance method

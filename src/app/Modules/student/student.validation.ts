@@ -78,6 +78,7 @@ const studentSchema = z.object({
       .default('') // Set a default value to ensure profileImg is always a string
       .transform(value => value.trim()),
     isActive: z.enum(['active', 'blocked']).default('active'),
+    isDeleted: z.boolean()
   });
   
   
