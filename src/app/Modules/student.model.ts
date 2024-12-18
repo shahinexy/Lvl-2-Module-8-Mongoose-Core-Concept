@@ -50,7 +50,7 @@ const gurdianSchema = new Schema<Gurdian>({
 // Main Schema
 const studentSchema = new Schema<Student, ModelOfStudent>({
   id: { type: String, required: true, unique: true },
-  password: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
   name: {
     type: userNameSchema,
     required: true,
@@ -100,8 +100,9 @@ studentSchema.pre('save', async function(next) {
 });
 
 // Post save middleware / Hook
-studentSchema.post('save', function() {
-
+studentSchema.post('save', function(doc, next) {
+  doc.password = '';
+  next()
 });
 
 
