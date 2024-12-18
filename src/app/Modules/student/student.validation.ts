@@ -1,101 +1,84 @@
-import Joi from "joi";
+import { z } from 'zod';
 
-const userNameSchema = Joi.object({
-    firstName: Joi.string()
-      .max(20)
-      .trim()
-      .regex(/^[A-Z][a-z]*$/)
-      .messages({
-        'string.pattern.base': '"{#label}" must be capitalized',
-        'string.max': '"{#label}" cannot exceed 20 characters',
-      })
-      .required()
-      .label('First Name'),
+// Zod schema for UserName
+const userNameSchema = z.object({
+  firstName: z
+    .string()
+    .min(1, { message: 'First name is required' })
+    .max(20, { message: 'First name cannot be greater than 20 characters' })
+    .transform((value) => value.trim()), // Trims whitespace
+  middleName: z
+    .string()
+    .optional()
+    .transform((value) => (value ? value.trim() : value)), // Trims if provided
+  lastName: z
+    .string()
+    .nonempty({ message: 'Last name is required' })
+    .refine((value) => /^[A-Za-z]+$/.test(value), {
+      message: 'Last name must contain only alphabetic characters',
+    })
+    .transform((value) => value.trim()), // Trims whitespace
+});
 
-    middleName: Joi.string().trim().optional(),
+// Zod schema for Guardian
+const guardianSchema = z.object({
+  fatherName: z
+    .string()
+    .nonempty({ message: 'Father name is required' })
+    .transform((value) => value.trim()),
+  fatherOccupation: z
+    .string()
+    .nonempty({ message: 'Father occupation is required' })
+    .transform((value) => value.trim()),
+  fatherContactNo: z
+    .string()
+    .nonempty({ message: 'Father contact number is required' })
+    .transform((value) => value.trim()),
+  motherName: z
+    .string()
+    .nonempty({ message: 'Mother name is required' })
+    .transform((value) => value.trim()),
+  motherOccupation: z
+    .string()
+    .nonempty({ message: 'Mother occupation is required' })
+    .transform((value) => value.trim()),
+  motherContactNo: z
+    .string()
+    .nonempty({ message: 'Mother contact number is required' })
+    .transform((value) => value.trim()),
+});
 
-    lastName: Joi.string()
-      .trim()
-      .regex(/^[A-Za-z]+$/)
-      .required()
-      .messages({
-        'string.pattern.base':
-          '"{#label}" must contain only alphabetic characters',
-      })
-      .label('Last Name'),
+// Zod schema for Student
+const studentSchema = z.object({
+    id: z.string().nonempty({ message: 'ID is required' }).transform(value => value.trim()),
+    name: userNameSchema,
+    gender: z.enum(['female', 'male'], {
+      errorMap: () => ({ message: 'Gender must be either female or male' }),
+    }),
+    dateOfBirth: z.string().optional().transform(value => (value ? value.trim() : value)),
+    email: z
+      .string()
+      .nonempty({ message: 'Email is required' })
+      .email({ message: 'Invalid email address' })
+      .transform(value => value.trim()),
+    contactNo: z
+      .string()
+      .nonempty({ message: 'Contact number is required' })
+      .transform(value => value.trim()),
+    bloodGroup: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']).optional(),
+    address: z.string().nonempty({ message: 'Address is required' }).transform(value => value.trim()),
+    emergancyNo: z
+      .string()
+      .nonempty({ message: 'Emergency number is required' })
+      .transform(value => value.trim()),
+    gurdian: guardianSchema,
+    profileImg: z
+      .string()
+      .default('') // Set a default value to ensure profileImg is always a string
+      .transform(value => value.trim()),
+    isActive: z.enum(['active', 'blocked']).default('active'),
   });
+  
+  
 
-  // Sub-schema for Gurdian
-  const gurdianSchema = Joi.object({
-    fatherName: Joi.string().trim().required().label('Father Name'),
-    fatherOccupation: Joi.string()
-      .trim()
-      .required()
-      .label('Father Occupation'),
-    fatherContactNo: Joi.string()
-      .pattern(/^\+?[1-9]\d{1,14}$/)
-      .required()
-      .messages({
-        'string.pattern.base': '"{#label}" must be a valid phone number',
-      })
-      .label('Father Contact Number'),
-    motherName: Joi.string().trim().required().label('Mother Name'),
-    motherOccupation: Joi.string()
-      .trim()
-      .required()
-      .label('Mother Occupation'),
-    motherContactNo: Joi.string()
-      .pattern(/^\+?[1-9]\d{1,14}$/)
-      .required()
-      .messages({
-        'string.pattern.base': '"{#label}" must be a valid phone number',
-      })
-      .label('Mother Contact Number'),
-  });
-
-  // Main schema for Student
-  const studentSchema = Joi.object({
-    id: Joi.string().trim().required().label('ID'),
-    name: userNameSchema.required().label('Name'),
-    gender: Joi.string()
-      .valid('female', 'male')
-      .required()
-      .messages({
-        'any.only': '"{#label}" must be one of [female, male]',
-      })
-      .label('Gender'),
-    dateOfBirth: Joi.string().isoDate().optional().label('Date of Birth'),
-    email: Joi.string()
-      .email()
-      .required()
-      .messages({
-        'string.email': '"{#label}" must be a valid email',
-      })
-      .label('Email'),
-    contactNo: Joi.string()
-      .pattern(/^\+?[1-9]\d{1,14}$/)
-      .optional()
-      .messages({
-        'string.pattern.base': '"{#label}" must be a valid phone number',
-      })
-      .label('Contact Number'),
-    bloodGroup: Joi.string()
-      .valid('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-')
-      .optional()
-      .messages({
-        'any.only': '"{#label}" must be a valid blood group',
-      })
-      .label('Blood Group'),
-    address: Joi.string().trim().required().label('Address'),
-    gurdian: gurdianSchema.required().label('Gurdian'),
-    profileImg: Joi.string().uri().optional().label('Profile Image'),
-    isActive: Joi.string()
-      .valid('active', 'blocked')
-      .default('active')
-      .messages({
-        'any.only': '"{#label}" must be one of [active, blocked]',
-      })
-      .label('Is Active'),
-  });
-
-  export default studentSchema;
+export default studentSchema;

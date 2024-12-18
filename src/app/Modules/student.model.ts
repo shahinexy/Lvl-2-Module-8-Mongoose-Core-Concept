@@ -10,13 +10,13 @@ const userNameSchema = new Schema<UserName>({
     maxlength: [20, 'First Name cna not be grathre then 20'],
     trim: true,
     // custom validation
-    validate: {
-      validator: function(value: string){
-        const firstNameStr = value[0].toUpperCase() + value.slice(1).toLowerCase();
-        return firstNameStr === value
-      },
-      message: '{VALUE} is not capitalize format'
-    }
+    // validate: {
+    //   validator: function(value: string){
+    //     const firstNameStr = value[0].toUpperCase() + value.slice(1).toLowerCase();
+    //     return firstNameStr === value
+    //   },
+    //   message: '{VALUE} is not capitalize format'
+    // }
   },
   middleName: { type: String, trim: true },
   lastName: { type: String, required: true, trim: true,
@@ -59,7 +59,8 @@ const studentSchema = new Schema<Student>({
       message: '{VALUE} is not a valid email' 
     }
    },
-  contactNo: { type: String },
+  contactNo: { type: String }, 
+  emergancyNo: {type: String},
   bloodGroup: {
     type: String,
     enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],

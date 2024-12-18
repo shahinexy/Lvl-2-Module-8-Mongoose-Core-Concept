@@ -1,29 +1,33 @@
 // ========= route -> controller -> service ==========
 import { Request, Response } from 'express';
 import { StudentServices } from './student.service';
-
 import studentSchema from './student.validation';
+
+// import studentSchema from './student.joi.validation';
 
 const createStudent = async (req: Request, res: Response) => {
   try {
-    // create Schema for validatin using Joi
-
+    
 
     const { student: studentData } = req.body;
 
-    const { error } = studentSchema.validate(studentData);
+    // data validation using joi 
+    // const { error, value } = studentSchema.validate(studentData);
+
+    // data validation using zod 
+    const zodParsedData = studentSchema.parse(studentData)
 
     // will call service functiont to to send this data
-    const result = await StudentServices.createStudentIntoDB(studentData);
+    const result = await StudentServices.createStudentIntoDB(zodParsedData);
 
-    if (error) {
-      res.status(500).json({
-        success: false,
-        message: 'Somthing went wrong',
-        error: error.details,
-      });
-      return;
-    }
+    // if (error) {
+    //   res.status(500).json({
+    //     success: false,
+    //     message: 'Somthing went wrong',
+    //     error: error.details,
+    //   });
+    //   return;
+    // }
 
     
     // send response
