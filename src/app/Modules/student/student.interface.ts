@@ -20,6 +20,7 @@ export type Gurdian = {
 // Main Interface
 export type Student = {
   id: string;
+  password: string,
   name: UserName;
   gender: 'male' | 'female';
   dateOfBirth?: string;

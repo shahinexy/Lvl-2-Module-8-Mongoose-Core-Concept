@@ -6,6 +6,8 @@ import {
   UserName,
 } from './student/student.interface';
 import validator from 'validator';
+import bcrypt from 'bcrypt'
+import config from '../config';
 
 // Sub Schema
 const userNameSchema = new Schema<UserName>({
@@ -48,6 +50,7 @@ const gurdianSchema = new Schema<Gurdian>({
 // Main Schema
 const studentSchema = new Schema<Student, ModelOfStudent>({
   id: { type: String, required: true, unique: true },
+  password: { type: String, required: true, unique: true },
   name: {
     type: userNameSchema,
     required: true,
@@ -88,6 +91,26 @@ const studentSchema = new Schema<Student, ModelOfStudent>({
     default: 'active',
   },
 });
+
+// Middleware 
+// Pre save middleware / Hook
+studentSchema.pre('save', async function(next) {
+  this.password = await bcrypt.hash(this.password, Number(config.bcrypt_salt_round))
+  next();
+});
+
+// Post save middleware / Hook
+studentSchema.post('save', function() {
+
+});
+
+
+
+
+
+
+
+
 
 // Create a custom instance method
 // studentSchema.methods.isUserExists = async function(id: string){
