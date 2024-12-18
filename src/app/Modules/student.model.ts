@@ -94,7 +94,17 @@ const studentSchema = new Schema<Student, ModelOfStudent>({
     type: Boolean,
     default: false
   }
+},{
+  toJSON: {
+    virtuals: true
+  }
 });
+
+// virtual
+studentSchema.virtual('fullName').get( function(){
+  return `${this.name.firstName} ${this.name.middleName} ${this.name.lastName}`
+})
+
 
 // Middleware 
 // Pre save middleware / Hook
