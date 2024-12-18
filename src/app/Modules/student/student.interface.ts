@@ -1,4 +1,4 @@
-import { Schema, model, connect } from 'mongoose';
+import { Schema, model, connect, Model } from 'mongoose';
 
 // Sub Interface
 export type UserName = {
@@ -32,3 +32,19 @@ export type Student = {
   profileImg: string;
   isActive: "active" | "blocked"
 };
+
+
+// Create a custom instance method
+// export type StudentMethods = {
+//   isUserExists(id: string) : Promise<Student | null>
+// }
+
+// export type ModelOfStudent = Model<Student, Record<string, never>, StudentMethods>;
+
+
+
+
+// Create a custom statics method
+export interface ModelOfStudent extends Model<Student> {
+  isUserExists(id: string) : Promise<Student | null>
+}

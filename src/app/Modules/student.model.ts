@@ -1,5 +1,10 @@
 import { Schema, model } from 'mongoose';
-import { Gurdian, Student, UserName } from './student/student.interface';
+import {
+  Gurdian,
+  ModelOfStudent,
+  Student,
+  UserName,
+} from './student/student.interface';
 import validator from 'validator';
 
 // Sub Schema
@@ -19,12 +24,15 @@ const userNameSchema = new Schema<UserName>({
     // }
   },
   middleName: { type: String, trim: true },
-  lastName: { type: String, required: true, trim: true,
+  lastName: {
+    type: String,
+    required: true,
+    trim: true,
     validate: {
       validator: (value: string) => validator.isAlpha(value),
-      message: '{VALUE} is not valid'
-    }
-   },
+      message: '{VALUE} is not valid',
+    },
+  },
 });
 
 // Sub Schema
@@ -38,7 +46,7 @@ const gurdianSchema = new Schema<Gurdian>({
 });
 
 // Main Schema
-const studentSchema = new Schema<Student>({
+const studentSchema = new Schema<Student, ModelOfStudent>({
   id: { type: String, required: true, unique: true },
   name: {
     type: userNameSchema,
@@ -53,14 +61,17 @@ const studentSchema = new Schema<Student>({
     required: true,
   },
   dateOfBirth: { type: String },
-  email: { type: String, required: true, unique: true,
+  email: {
+    type: String,
+    required: true,
+    unique: true,
     validate: {
       validator: (value: string) => validator.isEmail(value),
-      message: '{VALUE} is not a valid email' 
-    }
-   },
-  contactNo: { type: String }, 
-  emergancyNo: {type: String},
+      message: '{VALUE} is not a valid email',
+    },
+  },
+  contactNo: { type: String },
+  emergancyNo: { type: String },
   bloodGroup: {
     type: String,
     enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
@@ -78,5 +89,20 @@ const studentSchema = new Schema<Student>({
   },
 });
 
+// Create a custom instance method
+// studentSchema.methods.isUserExists = async function(id: string){
+//   const existingUser = await StudentModle.findOne({id})
+//   return existingUser;
+// }
+
+// Create a custom statics method
+studentSchema.statics.isUserExists = async function (id: string) {
+  const existingUser = await StudentModle.findOne({ id });
+  return existingUser;
+};
+
 // Model
-export const StudentModle = model<Student>('Student', studentSchema);
+export const StudentModle = model<Student, ModelOfStudent>(
+  'Student',
+  studentSchema,
+);
