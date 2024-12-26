@@ -51,7 +51,6 @@ const guardianSchema = z.object({
 // Zod schema for Student
 const studentSchema = z.object({
     id: z.string().nonempty({ message: 'ID is required' }).transform(value => value.trim()),
-    password: z.string().nonempty({ message: 'Password is required' }).transform(value => value.trim()),
     name: userNameSchema,
     gender: z.enum(['female', 'male'], {
       errorMap: () => ({ message: 'Gender must be either female or male' }),
@@ -77,7 +76,6 @@ const studentSchema = z.object({
       .string()
       .default('') // Set a default value to ensure profileImg is always a string
       .transform(value => value.trim()),
-    isActive: z.enum(['active', 'blocked']).default('active'),
     isDeleted: z.boolean()
   });
   

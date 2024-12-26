@@ -1,4 +1,4 @@
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 // Sub Interface
 export type UserName = {
@@ -20,7 +20,7 @@ export type Gurdian = {
 // Main Interface
 export type Student = {
   id: string;
-  password: string,
+  user: Types.ObjectId;
   name: UserName;
   gender: 'male' | 'female';
   dateOfBirth?: string;
@@ -31,7 +31,6 @@ export type Student = {
   address: string;
   gurdian: Gurdian;
   profileImg: string;
-  isActive: "active" | "blocked";
   isDeleted: boolean;
 };
 

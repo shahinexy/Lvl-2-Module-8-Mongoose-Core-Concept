@@ -6,8 +6,6 @@ import {
   UserName,
 } from './student.interface';
 import validator from 'validator';
-import bcrypt from 'bcrypt'
-import config from '../../config';
 
 // Sub Schema
 const userNameSchema = new Schema<UserName>({
@@ -50,11 +48,13 @@ const gurdianSchema = new Schema<Gurdian>({
 // Main Schema
 const studentSchema = new Schema<Student, ModelOfStudent>({
   id: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  name: {
-    type: userNameSchema,
-    required: true,
+  user: {
+    type: Schema.Types.ObjectId,
+    required: [true, "User id is required"],
+    unique: true,
+    ref: "User"
   },
+  name: {type: userNameSchema, required: true},
   gender: {
     type: String,
     enum: {
@@ -85,11 +85,6 @@ const studentSchema = new Schema<Student, ModelOfStudent>({
     required: true,
   },
   profileImg: { type: String },
-  isActive: {
-    type: String,
-    enum: ['active', 'blocked'],
-    default: 'active',
-  },
   isDeleted: {
     type: Boolean,
     default: false
@@ -107,17 +102,6 @@ studentSchema.virtual('fullName').get( function(){
 
 
 // Middleware 
-// Pre save middleware / Hook
-studentSchema.pre('save', async function(next) {
-  this.password = await bcrypt.hash(this.password, Number(config.bcrypt_salt_round))
-  next();
-});
-
-// Post save middleware / Hook
-studentSchema.post('save', function(doc, next) {
-  doc.password = '';
-  next()
-});
 
 studentSchema.pre('find', function(next){
   this.find({isDeleted : {$ne : true}})

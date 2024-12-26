@@ -2,6 +2,7 @@
 import cors from 'cors';
 import express, { Application, Request, Response } from 'express';
 import { StudentRouters } from './app/Modules/student/student.route';
+import { UserRouters } from './app/Modules/user/user.route';
 const app: Application = express();
 // const port = 3000
 
@@ -9,8 +10,11 @@ const app: Application = express();
 app.use(express.json());
 app.use(cors());
 
-// aplication routes
+// students routes
 app.use('/api/vi/students', StudentRouters)
+
+// users router
+app.use('/api/vi/users', UserRouters)
 
 app.get('/', (req: Request, res: Response) => {
   const a = 10;
