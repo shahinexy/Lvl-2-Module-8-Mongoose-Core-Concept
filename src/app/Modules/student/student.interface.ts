@@ -1,4 +1,4 @@
-import { Schema, model, connect, Model } from 'mongoose';
+import { Model } from 'mongoose';
 
 // Sub Interface
 export type UserName = {

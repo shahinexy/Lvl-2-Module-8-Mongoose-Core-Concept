@@ -1,5 +1,5 @@
 // ========= route -> controller -> service ==========
-import { StudentModle } from "../student.model";
+import { StudentModle } from "./student.model";
 import { Student } from "./student.interface";
 
 const createStudentIntoDB = async (studentData: Student) =>{
