@@ -1,10 +1,9 @@
 // const express = require('express')
 import cors from 'cors';
 import express, { Application, Request, Response } from 'express';
-import { StudentRouters } from './app/Modules/student/student.route';
-import { UserRouters } from './app/Modules/user/user.route';
 import globalErrorHandler from './app/middlwares/globalErrorHandler';
 import notFound from './app/middlwares/notFound';
+import router from './app/router';
 const app: Application = express();
 
 //parsers
@@ -12,10 +11,8 @@ app.use(express.json());
 app.use(cors());
 
 // students routes
-app.use('/api/vi/students', StudentRouters)
+app.use('/api/vi', router)
 
-// users router
-app.use('/api/vi/users', UserRouters)
 
 app.get('/', (req: Request, res: Response) => {
   const a = 10;
