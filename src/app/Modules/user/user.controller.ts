@@ -1,28 +1,24 @@
 // import studentSchema from "../student/student.validation";
 
-import { NextFunction, Request, Response } from "express";
-import { UserServices } from "./user.server";
+import { UserServices } from './user.server';
+import sendResponse from '../../utils/sendResponse';
+import catchAsync from '../../utils/catchAsync';
 
+const createStudent = catchAsync(async (req, res) => {
+  const { password, student: studentData } = req.body;
 
-const createStudent = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      
-      const {password, student: studentData } = req.body;
+  //   const zodParsedData = studentSchema.parse(studentData)
 
-    //   const zodParsedData = studentSchema.parse(studentData)
+  const result = await UserServices.createStudentIntoDB(password, studentData);
 
-      const result = await UserServices.createStudentIntoDB(password, studentData);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Student created successfully',
+    data: result,
+  });
+});
 
-      res.status(200).json({
-        success: true,
-        message: 'Student created successfully',
-        data: result,
-      });
-    } catch (err) {
-      next(err)
-    }
-  };
-
-  export const UsreControllers ={
-    createStudent
-  }
+export const UsreControllers = {
+  createStudent,
+};
