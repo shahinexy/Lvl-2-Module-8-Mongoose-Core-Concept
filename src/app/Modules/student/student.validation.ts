@@ -49,36 +49,46 @@ const guardianSchema = z.object({
 });
 
 // Zod schema for Student
-const studentSchema = z.object({
-    id: z.string().nonempty({ message: 'ID is required' }).transform(value => value.trim()),
-    name: userNameSchema,
-    gender: z.enum(['female', 'male'], {
-      errorMap: () => ({ message: 'Gender must be either female or male' }),
+const createStudentValidationSchema = z.object({
+  body: z.object({
+    student: z.object({
+      name: userNameSchema,
+      gender: z.enum(['female', 'male'], {
+        errorMap: () => ({ message: 'Gender must be either female or male' }),
+      }),
+      dateOfBirth: z
+        .string()
+        .optional()
+        .transform((value) => (value ? value.trim() : value)),
+      email: z
+        .string()
+        .nonempty({ message: 'Email is required' })
+        .email({ message: 'Invalid email address' })
+        .transform((value) => value.trim()),
+      contactNo: z
+        .string()
+        .nonempty({ message: 'Contact number is required' })
+        .transform((value) => value.trim()),
+      bloodGroup: z
+        .enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])
+        .optional(),
+      address: z
+        .string()
+        .nonempty({ message: 'Address is required' })
+        .transform((value) => value.trim()),
+      emergancyNo: z
+        .string()
+        .nonempty({ message: 'Emergency number is required' })
+        .transform((value) => value.trim()),
+      gurdian: guardianSchema,
+      profileImg: z
+        .string()
+        .default('')
+        .transform((value) => value.trim()),
     }),
-    dateOfBirth: z.string().optional().transform(value => (value ? value.trim() : value)),
-    email: z
-      .string()
-      .nonempty({ message: 'Email is required' })
-      .email({ message: 'Invalid email address' })
-      .transform(value => value.trim()),
-    contactNo: z
-      .string()
-      .nonempty({ message: 'Contact number is required' })
-      .transform(value => value.trim()),
-    bloodGroup: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']).optional(),
-    address: z.string().nonempty({ message: 'Address is required' }).transform(value => value.trim()),
-    emergancyNo: z
-      .string()
-      .nonempty({ message: 'Emergency number is required' })
-      .transform(value => value.trim()),
-    gurdian: guardianSchema,
-    profileImg: z
-      .string()
-      .default('') // Set a default value to ensure profileImg is always a string
-      .transform(value => value.trim()),
-    isDeleted: z.boolean()
-  });
-  
-  
+  }),
+});
 
-export default studentSchema;
+export const studentValidations = {
+  createStudentValidationSchema,
+};
