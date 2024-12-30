@@ -2,6 +2,7 @@ import {
   TAcademicSemesterCode,
   TAcademicSemesterName,
   TMonths,
+  TsemesterNameCodeMapper,
 } from './academicSemester.inferface';
 
 export const Months: TMonths[] = [
@@ -30,3 +31,9 @@ export const AcademicSemesterSchemaCode: TAcademicSemesterCode[] = [
   '02',
   '03',
 ];
+
+export const semesterNameCodeMapper: TsemesterNameCodeMapper = {
+  Autumn: '01',
+  Summar: '02',
+  Fall: '03',
+};
