@@ -23,7 +23,7 @@ const createStudentIntoDB = async (password: string, payload: Student) => {
     throw new Error('Admission semester not found.');
   }  
 
-  userData.id = GenaretStudentId(admissionSemester);
+  userData.id = await GenaretStudentId(admissionSemester);
 
   // create a user
   const newUser = await UserModel.create(userData);

@@ -5,7 +5,7 @@ import config from "../../config";
 import bcrypt from 'bcrypt'
 
 const UserSchema = new Schema<TUser>({
-    id: {type: String, required: true},
+    id: {type: String, required: true, unique: true},
     password: {type: String, required: true},
     needsPasswordChange: {type: Boolean, default: true},
     role: {
