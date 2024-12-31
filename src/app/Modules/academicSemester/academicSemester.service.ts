@@ -20,8 +20,15 @@ const getSingleAcademicSemesterFromDB = async (semesterId: string) =>{
     return result;
 }
 
+const updateSingleAcademicSemesterFromDB = async (semesterId: string, updatedData: TAcademicSemester) =>{{
+  const result = await AcademicSemesterModel.updateOne({_id: semesterId}, {$set: updatedData})
+  return result;
+}}
+
+
 export const AcademicSemesterServices = {
   createAcademicSemesterInDB,
   getAllAcademicSemesterFromDB,
-  getSingleAcademicSemesterFromDB
+  getSingleAcademicSemesterFromDB,
+  updateSingleAcademicSemesterFromDB
 };
