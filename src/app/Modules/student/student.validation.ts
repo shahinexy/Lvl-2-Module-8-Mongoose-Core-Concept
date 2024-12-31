@@ -57,7 +57,7 @@ const createStudentValidationSchema = z.object({
         errorMap: () => ({ message: 'Gender must be either female or male' }),
       }),
       dateOfBirth: z
-        .date()
+        .string()
         .optional(),
       email: z
         .string()
@@ -81,9 +81,10 @@ const createStudentValidationSchema = z.object({
         .transform((value) => value.trim()),
       gurdian: guardianSchema,
       profileImg: z
-        .string()
-        .default('')
-        .transform((value) => value.trim()),
+      .string()
+      .default('')
+      .transform((value) => value.trim()),
+      admissionSemester: z.string(),
     }),
   }),
 });

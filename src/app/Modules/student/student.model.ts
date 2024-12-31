@@ -85,6 +85,10 @@ const studentSchema = new Schema<Student, ModelOfStudent>({
     required: true,
   },
   profileImg: { type: String },
+  admissionSemester: {
+    type: Schema.Types.ObjectId,
+    ref: 'AcademicSemester'
+  },
   isDeleted: {
     type: Boolean,
     default: false
@@ -92,7 +96,8 @@ const studentSchema = new Schema<Student, ModelOfStudent>({
 },{
   toJSON: {
     virtuals: true
-  }
+  },
+  timestamps: true
 });
 
 // virtual

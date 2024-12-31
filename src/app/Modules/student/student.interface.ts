@@ -31,6 +31,7 @@ export type Student = {
   address: string;
   gurdian: Gurdian;
   profileImg: string;
+  admissionSemester: Types.ObjectId;
   isDeleted: boolean;
 };
 
