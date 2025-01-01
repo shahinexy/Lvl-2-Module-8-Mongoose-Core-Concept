@@ -20,11 +20,6 @@ router.get(
   AcademicFacultyControllers.getSingleAcademicFaculty,
 );
 
-router.get(
-  '/:facultyId',
-  AcademicFacultyControllers.getSingleAcademicFaculty,
-);
-
 router.patch(
   '/:facultyId',
   valideteRequest(
