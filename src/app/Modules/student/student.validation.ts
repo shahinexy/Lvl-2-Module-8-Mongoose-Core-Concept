@@ -85,6 +85,7 @@ const createStudentValidationSchema = z.object({
       .default('')
       .transform((value) => value.trim()),
       admissionSemester: z.string(),
+      academicDepartment: z.string(),
     }),
   }),
 });
