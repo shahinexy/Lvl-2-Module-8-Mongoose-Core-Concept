@@ -26,7 +26,7 @@ const updateSingleAcademicSemesterFromDB = async (semesterId: string, payload: P
     throw new Error('Invalid Semester Code')
   }
 
-  const result = await AcademicSemesterModel.updateOne({_id: semesterId}, {$set: payload})
+  const result = await AcademicSemesterModel.findOneAndUpdate({_id: semesterId}, {$set: payload}, {new: true})
   return result;
 }
 
