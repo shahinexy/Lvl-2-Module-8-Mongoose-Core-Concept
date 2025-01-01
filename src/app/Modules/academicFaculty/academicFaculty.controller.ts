@@ -32,7 +32,7 @@ const getSingleAcademicFaculty = catchAsync(async (req, res)=>{
     sendResponse(res, {
         statusCode: 200,
         success: true,
-        message: 'Single Academic Semester get successfully',
+        message: 'Single Academic Faculty get successfully',
         data: result,
       });
 })
