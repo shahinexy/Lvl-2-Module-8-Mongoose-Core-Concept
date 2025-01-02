@@ -9,6 +9,12 @@ import { UserModel } from './user.model';
 import { GenaretStudentId } from './user.utils';
 
 const createStudentIntoDB = async (password: string, payload: Student) => {
+  const isEmailExists = await StudentModle.findOne({email: payload.email})
+
+  if(isEmailExists){
+    throw new AppError(400, 'Email already exists')
+  }
+
   // create a user object
   const userData: Partial<TUser> = {};
 
