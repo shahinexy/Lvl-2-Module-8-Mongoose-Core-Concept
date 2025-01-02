@@ -1,6 +1,8 @@
 // ========= route -> controller -> service ==========
 import express from 'express'
 import { StudentController } from './student.controller'
+import valideteRequest from '../../middlwares/validetRequest'
+import { studentValidations } from './student.validation'
 
 const router = express.Router()
 
@@ -10,7 +12,7 @@ router.get('/', StudentController.getAllStudents)
 
 router.get('/:studentId', StudentController.getStudent)
 
-router.patch('/:studentId', StudentController.updateStudent)
+router.patch('/:studentId', valideteRequest(studentValidations.updateStudentValidationSchema), StudentController.updateStudent)
 
 router.delete('/:studentId', StudentController.deleteStudent)
 

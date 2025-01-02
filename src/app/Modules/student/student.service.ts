@@ -20,7 +20,7 @@ const getAllStudentsFronDB = async () => {
 const getSingleStudentFromDB = async (id: string) => {
   // const result = await StudentModle.findOne({id})
 
-  const result = await StudentModle.findOne({id}).populate({
+  const result = await StudentModle.findOne({ id }).populate({
     path: 'academicDepartment',
     populate: {
       path: 'academicFaculty',
@@ -29,19 +29,43 @@ const getSingleStudentFromDB = async (id: string) => {
   return result;
 };
 
-const updateStudentInDb = async (id: string, payload: Partial<Student>) =>{
-    const result = await StudentModle.findOneAndUpdate({id: id}, payload, {new: true})
-    return result
-}
+const updateStudentInDb = async (id: string, payload: Partial<Student>) => {
+  const { name, gurdian, ...remainingStudentData } = payload;
+
+  const modifiedUpdatedData: Record<string, unknown> = {
+    ...remainingStudentData,
+  };
+
+  if (name && Object.keys(name).length) {
+    for (const [key, value] of Object.entries(name)) {
+      modifiedUpdatedData[`name.${key}`] = value;
+    }
+  }
+
+  if (gurdian && Object.keys(gurdian).length) {
+    for (const [key, value] of Object.entries(gurdian)) {
+      modifiedUpdatedData[`name.${key}`] = value;
+    }
+  }
+
+  const result = await StudentModle.findOneAndUpdate(
+    { id: id },
+    modifiedUpdatedData,
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
+  return result;
+};
 
 // ===== transaction & rollback ====
 const deleteStudentFromDB = async (id: string) => {
+  const isIdExists = await StudentModle.findOne({ id: id });
 
-    const isIdExists = await StudentModle.findOne({id: id})
-
-    if(!isIdExists){
-      throw new AppError(400, 'This user dose not exists')
-    }
+  if (!isIdExists) {
+    throw new AppError(400, 'This user dose not exists');
+  }
 
   const session = await mongoose.startSession();
 
@@ -75,6 +99,8 @@ const deleteStudentFromDB = async (id: string) => {
   } catch (error) {
     await session.abortTransaction();
     await session.endSession();
+
+    throw new Error('Faild to delete student');
   }
 };
 
@@ -82,5 +108,5 @@ export const StudentServices = {
   getAllStudentsFronDB,
   getSingleStudentFromDB,
   updateStudentInDb,
-  deleteStudentFromDB
+  deleteStudentFromDB,
 };
