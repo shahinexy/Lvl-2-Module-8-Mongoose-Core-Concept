@@ -18,8 +18,6 @@ const getAllStudentsFronDB = async () => {
 };
 
 const getSingleStudentFromDB = async (id: string) => {
-  // const result = await StudentModle.findOne({id})
-
   const result = await StudentModle.findOne({ id }).populate({
     path: 'academicDepartment',
     populate: {
@@ -29,21 +27,49 @@ const getSingleStudentFromDB = async (id: string) => {
   return result;
 };
 
-const searchStudentFromDB = async (query: Record<string, unknown>) =>{
+const searchStudentFromDB = async (query: Record<string, unknown>) => {
+  console.log('base quesry', query);
+
+  const queryObject = { ...query };
+
+  const studentSearchbleField = ['email', 'name.firstName', 'address'];
+
   let searchTerm = '';
-  if(query?.searchTerm){
+  if (query?.searchTerm) {
     searchTerm = query?.searchTerm as string;
   }
 
-  const result = await StudentModle.find({
-    $or: ['email', 'name.firstName', 'address'].map((field)=>({
-      [field]: {$regex: searchTerm, $options: 'i'}
-    }))
-  })
+  const excludefield = ['searchTerm', 'sort', 'limit'];
 
-  return result;
+  excludefield.forEach((el) => delete queryObject[el]);
+  console.log({ query, queryObject });
 
-}
+  const searchQuery = StudentModle.find({
+    $or: studentSearchbleField.map((field) => ({
+      [field]: { $regex: searchTerm, $options: 'i' },
+    })),
+  });
+
+  const filterQuery = searchQuery.find(queryObject);
+
+  let sort = '-createdAt';
+
+  if (query.sort) {
+    sort = query.sort as string;
+  }
+
+  const sortQuery = filterQuery.sort(sort);
+
+  let limit = 1;
+
+  if (query.limit) {
+    limit = Number(query.limit) ;
+  }
+
+  const limitQuery = await sortQuery.limit(limit);
+
+  return limitQuery;
+};
 
 const updateStudentInDb = async (id: string, payload: Partial<Student>) => {
   const { name, gurdian, ...remainingStudentData } = payload;
