@@ -11,18 +11,17 @@ app.use(express.json());
 app.use(cors());
 
 // students routes
-app.use('/api/vi', router)
+app.use('/api/vi', router);
 
-
-app.get('/', (req: Request, res: Response) => {
+app.get('/', async (req: Request, res: Response) => {
   const a = 10;
   res.send(a);
 });
 
-// global error handler 
-app.use(globalErrorHandler)
+// global error handler
+app.use(globalErrorHandler);
 
 // 404 router not found
-app.use(notFound)
+app.use(notFound);
 
 export default app;
