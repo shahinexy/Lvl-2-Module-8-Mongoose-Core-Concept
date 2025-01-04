@@ -29,6 +29,22 @@ const getSingleStudentFromDB = async (id: string) => {
   return result;
 };
 
+const searchStudentFromDB = async (query: Record<string, unknown>) =>{
+  let searchTerm = '';
+  if(query?.searchTerm){
+    searchTerm = query?.searchTerm as string;
+  }
+
+  const result = await StudentModle.find({
+    $or: ['email', 'name.firstName', 'address'].map((field)=>({
+      [field]: {$regex: searchTerm, $options: 'i'}
+    }))
+  })
+
+  return result;
+
+}
+
 const updateStudentInDb = async (id: string, payload: Partial<Student>) => {
   const { name, gurdian, ...remainingStudentData } = payload;
 
@@ -107,6 +123,7 @@ const deleteStudentFromDB = async (id: string) => {
 export const StudentServices = {
   getAllStudentsFronDB,
   getSingleStudentFromDB,
+  searchStudentFromDB,
   updateStudentInDb,
   deleteStudentFromDB,
 };

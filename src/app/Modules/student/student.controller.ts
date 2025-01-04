@@ -34,6 +34,18 @@ const getStudent = catchAsync(async (req, res) => {
   });
 });
 
+const searchStudent = catchAsync(async(req,res)=>{
+  const query = req.query;
+  const result = await StudentServices.searchStudentFromDB(query)
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Get searched Student successfully',
+    data: result,
+  });
+})
+
 const updateStudent = catchAsync(async (req, res) => {
   const { studentId } = req.params;
   const {student} = req.body;
@@ -62,6 +74,7 @@ const deleteStudent = catchAsync(async (req, res) => {
 export const StudentController = {
   getAllStudents,
   getStudent,
+  searchStudent,
   updateStudent,
   deleteStudent,
 };
