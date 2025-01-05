@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { FacultyModel, TFaculty, TUserName } from './faculty.interface';
+import { ModelOfFaculty, TFaculty, TUserName } from './faculty.interface';
 import { BloodGroup, Gender } from './faculty.constant';
 
 const userNameSchema = new Schema<TUserName>({
@@ -21,7 +21,7 @@ const userNameSchema = new Schema<TUserName>({
   },
 });
 
-const facultySchema = new Schema<TFaculty, FacultyModel>(
+const facultySchema = new Schema<TFaculty, ModelOfFaculty>(
   {
     id: {
       type: String,
@@ -123,8 +123,8 @@ facultySchema.pre('aggregate', function (next) {
 
 //checking if user is already exist!
 facultySchema.statics.isUserExists = async function (id: string) {
-  const existingUser = await Faculty.findOne({ id });
+  const existingUser = await FacultyModel.findOne({ id });
   return existingUser;
 };
 
-export const Faculty = model<TFaculty, FacultyModel>('Faculty', facultySchema);
+export const FacultyModel = model<TFaculty, ModelOfFaculty>('Faculty', facultySchema);

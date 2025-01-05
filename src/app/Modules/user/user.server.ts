@@ -7,6 +7,9 @@ import { StudentModle } from '../student/student.model';
 import { TUser } from './user.interface';
 import { UserModel } from './user.model';
 import { GenaretStudentId } from './user.utils';
+import { TFaculty } from '../faculty/faculty.interface';
+import { AcademicDepartmentModel } from '../academicDepartment/academicDepartment.model';
+import { FacultyModel } from '../faculty/faculty.model';
 
 const createStudentIntoDB = async (password: string, payload: Student) => {
   const isEmailExists = await StudentModle.findOne({email: payload.email})
@@ -24,7 +27,7 @@ const createStudentIntoDB = async (password: string, payload: Student) => {
   // set student role
   userData.role = 'student';
 
-  // genareted student id
+  // 
   const admissionSemester = await AcademicSemesterModel.findById(
     payload.admissionSemester,
   );
@@ -39,6 +42,7 @@ const createStudentIntoDB = async (password: string, payload: Student) => {
   try {
     session.startTransaction();
 
+    // genareted student id
     userData.id = await GenaretStudentId(admissionSemester);
 
     // create a user
@@ -71,6 +75,61 @@ const createStudentIntoDB = async (password: string, payload: Student) => {
   }
 };
 
+
+const createFacultyIntoDB = async(password: string, payload: TFaculty)=>{
+
+  // create a user object 
+  const userData: Partial<TUser> = {};
+
+  userData.password = password || (config.default_password as string);
+
+  // set feculty role
+  userData.role = 'faculty';
+
+  // genaret faculty id
+  userData.id = 'F-0001';
+
+  const academicDepartment = await AcademicDepartmentModel.findById(payload.id);
+
+  if(!academicDepartment){
+    throw new AppError(404, 'Academic Department not found')
+  }
+
+  // transaction rollback 
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+
+    const newUser = await UserModel.create([userData], {session});
+
+    if(!newUser.length){
+      throw new AppError(400, 'Faild to create user');
+    }
+
+    payload.id = newUser[0].id;
+    payload.user = newUser[0]._id;
+
+    const newFaculty = await FacultyModel.create([payload], {session});
+
+    if(!newFaculty){
+      throw new AppError(400, 'Faild to create user');
+    }
+
+    await session.commitTransaction();
+    await session.endSession();
+
+    return newFaculty;
+    
+  } catch (error) {
+    await session.abortTransaction();
+    await session.endSession();
+
+    throw new AppError(404, 'Faild to create Faculty')
+  }
+}
+
 export const UserServices = {
   createStudentIntoDB,
+  createFacultyIntoDB
 };
