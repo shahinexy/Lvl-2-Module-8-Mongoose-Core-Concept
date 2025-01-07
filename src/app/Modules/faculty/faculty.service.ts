@@ -4,7 +4,6 @@
 import mongoose from 'mongoose';
 import AppError from '../../error/AppError';
 import { UserModel } from '../user/user.model';
-import QueryBuilder from '../../builder/QueryBuilder';
 import { FacultyModel } from './faculty.model';
 import { TFaculty } from './faculty.interface';
 // import { TFaculty } from './faculty.interface';
@@ -132,7 +131,7 @@ const updateFacultyInDB = async (id: string, payload: Partial<TFaculty>) => {
 
 // ===== transaction & rollback ====
 const deleteFacultyFromDB = async (id: string) => {
-  const isIdExists = await FacultyModel.findOne({ id: id });
+  const isIdExists = await FacultyModel.findById(id);
 
   if (!isIdExists) {
     throw new AppError(400, 'This Faculty dose not exists');
@@ -153,14 +152,16 @@ const deleteFacultyFromDB = async (id: string) => {
       throw new AppError(400, 'Faild to delete Facultyt');
     }
 
+    const userId = deleteFacultyt.user;
+
     const deleteUser = await UserModel.findByIdAndUpdate(
-       id,
+      userId,
       { isDeleted: true },
       { new: true, session },
     );
 
     if (!deleteUser) {
-      throw new AppError(400, 'Faild to delete Faculty');
+      throw new AppError(400, 'Faild to delete User');
     }
 
     await session.commitTransaction();
