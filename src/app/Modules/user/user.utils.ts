@@ -73,14 +73,11 @@ export const GenaretFacultyId = async()=>{
     let currentId = (0).toString();
 
     const lastFacultyId = await findLastFacultyId()
-console.log({lastFacultyId});
     if(lastFacultyId){
       currentId = lastFacultyId ;
     }
 
     let increment = (Number(currentId)+1).toString().padStart(4,'0');
-
-    console.log({increment});
 
     increment = `F-${increment}`
 

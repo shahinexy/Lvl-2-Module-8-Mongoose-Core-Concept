@@ -67,11 +67,11 @@ const createStudentIntoDB = async (password: string, payload: Student) => {
     await session.endSession();
 
     return newStudent;
-  } catch (error) {
+  } catch (error: any) {
     await session.abortTransaction();
     await session.endSession();
 
-    throw new Error('Faild to create studnet');
+    throw new Error(error);
   }
 };
 
