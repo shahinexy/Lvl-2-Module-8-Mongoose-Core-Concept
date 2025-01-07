@@ -1,4 +1,3 @@
-
 // ========= route -> controller -> service ==========
 import sendResponse from '../../utils/sendResponse';
 import catchAsync from '../../utils/catchAsync';
@@ -29,9 +28,9 @@ const getFaculty = catchAsync(async (req, res) => {
   });
 });
 
-const searchFaculty = catchAsync(async(req,res)=>{
+const searchFaculty = catchAsync(async (req, res) => {
   const query = req.query;
-  const result = await FacultyServices.searchFacultyFromDB(query)
+  const result = await FacultyServices.searchFacultyFromDB(query);
 
   sendResponse(res, {
     statusCode: 200,
@@ -39,11 +38,11 @@ const searchFaculty = catchAsync(async(req,res)=>{
     message: 'Get searched Faculty successfully',
     data: result,
   });
-})
+});
 
 const updateFaculty = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const {faculty} = req.body;
+  const { faculty } = req.body;
   const result = await FacultyServices.updateFacultyInDB(id, faculty);
 
   sendResponse(res, {

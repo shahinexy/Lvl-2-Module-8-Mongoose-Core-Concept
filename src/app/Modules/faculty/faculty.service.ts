@@ -6,7 +6,7 @@ import AppError from '../../error/AppError';
 import { UserModel } from '../user/user.model';
 import { FacultyModel } from './faculty.model';
 import { TFaculty } from './faculty.interface';
-// import { TFaculty } from './faculty.interface';
+import QueryBuilder from '../../builder/QueryBuilder';
 
 const getAllFacultysFronDB = async () => {
   const res = await FacultyModel.find()
@@ -19,91 +19,23 @@ const getSingleFacultyFromDB = async (id: string) => {
 };
 
 const searchFacultyFromDB = async (query: Record<string, unknown>) => {
-  // console.log('base quesry', query);
+  const facultySearchbleField = ['email', 'name.firstName', 'designation'];
 
-  // const queryObject = { ...query };
+  const facultyQuery = new QueryBuilder(
+    FacultyModel.find(),
+    query
+  )
+    .search(facultySearchbleField)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
 
-  // // == Search ==
-//   const facultySearchbleField = ['email', 'name.firstName', 'address'];
+  const result = await facultyQuery.modelQuery;
 
-  // let searchTerm = '';
-  // if (query?.searchTerm) {
-  //   searchTerm = query?.searchTerm as string;
-  // }
-
-  // const searchQuery = StudentModle.find({
-  //   $or: studentSearchbleField.map((field) => ({
-  //     [field]: { $regex: searchTerm, $options: 'i' },
-  //   })),
-  // });
-
-  // // == Filter ==
-  // const excludefield = ['searchTerm', 'sort', 'limit', 'page', 'fields'];
-
-  // excludefield.forEach((el) => delete queryObject[el]);
-  // console.log({ query, queryObject });
-
-  // const filterQuery = searchQuery.find(queryObject);
-
-  // // Sort
-  // let sort = '-createdAt';
-
-  // if (query.sort) {
-  //   sort = query.sort as string;
-  // }
-
-  // const sortQuery = filterQuery.sort(sort);
-
-  // == Pagination ==
-  // let page = 1;
-  // let limit = 1;
-  // let skip = 1;
-
-  // if (query.limit) {
-  //   limit = Number(query.limit);
-  // }
-
-  // if(query.page){
-  //   page = Number(query.page)
-  //   skip = (page-1)*limit
-  // }
-
-  // const paginateQuery = sortQuery.skip(skip);
-
-  // const limitQuery =  paginateQuery.limit(limit);
-
-  // // == Field limiting ==
-  // let fields = '__v';
-
-  // if(query.fields){
-  //   fields = (query.fields as string).split(',').join(' ')
-  // }
-
-  // const fiedsQuery = await limitQuery.select(fields)
-
-  // return fiedsQuery;
-
-//   const FacultytQuery = new QueryBuilder(
-//     FacultytModle.find()
-//       .populate('admissionSemester')
-//       .populate({
-//         path: 'academicDepartment',
-//         populate: {
-//           path: 'academicFaculty',
-//         },
-//       }),
-//     query,
-//   )
-//     .search(FacultytSearchbleField)
-//     .filter()
-//     .sort()
-//     .paginate()
-//     .fields();
-
-//   const result = await FacultytQuery.modelQuery;
-
-//   return result;
+  return result;
 };
+
 
 const updateFacultyInDB = async (id: string, payload: Partial<TFaculty>) => {
   const { name, ...remainingFacultytData } = payload;
