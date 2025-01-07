@@ -6,7 +6,7 @@ import { Student } from '../student/student.interface';
 import { StudentModle } from '../student/student.model';
 import { TUser } from './user.interface';
 import { UserModel } from './user.model';
-import { GenaretStudentId } from './user.utils';
+import { GenaretFacultyId, GenaretStudentId } from './user.utils';
 import { TFaculty } from '../faculty/faculty.interface';
 import { AcademicDepartmentModel } from '../academicDepartment/academicDepartment.model';
 import { FacultyModel } from '../faculty/faculty.model';
@@ -97,12 +97,12 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
     session.startTransaction();
 
     // genaret faculty id
-    userData.id = 'F-0001';
+    userData.id = await GenaretFacultyId();
 
     const newUser = await UserModel.create([userData], { session });
 
     if (!newUser.length) {
-      throw new AppError(400, 'Faild to create user');
+      throw new AppError(400, 'Faild to create User');
     }
 
     payload.id = newUser[0].id;
@@ -111,18 +111,18 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
     const newFaculty = await FacultyModel.create([payload], { session });
 
     if (!newFaculty) {
-      throw new AppError(400, 'Faild to Faculty user');
+      throw new AppError(400, 'Faild to create Faculty');
     }
 
     await session.commitTransaction();
     await session.endSession();
 
     return newFaculty;
-  } catch (error) {
+  } catch (error: any) {
     await session.abortTransaction();
     await session.endSession();
 
-    throw new AppError(404, 'Faild to create Faculty');
+    throw new Error(error);
   }
 };
 
