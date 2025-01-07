@@ -6,10 +6,12 @@ import { Student } from '../student/student.interface';
 import { StudentModle } from '../student/student.model';
 import { TUser } from './user.interface';
 import { UserModel } from './user.model';
-import { GenaretFacultyId, GenaretStudentId } from './user.utils';
+import { GenaretAdminId, GenaretFacultyId, GenaretStudentId } from './user.utils';
 import { TFaculty } from '../faculty/faculty.interface';
 import { AcademicDepartmentModel } from '../academicDepartment/academicDepartment.model';
 import { FacultyModel } from '../faculty/faculty.model';
+import { TAdmin } from '../admin/admin.interface';
+import { AdminModel } from '../admin/admin.model';
 
 const createStudentIntoDB = async (password: string, payload: Student) => {
   const isEmailExists = await StudentModle.findOne({ email: payload.email });
@@ -126,7 +128,59 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
   }
 };
 
+const createAdminIntoDB = async (password: string, payload: TAdmin) => {
+  // create a user object
+  const userData: Partial<TUser> = {};
+
+  userData.password = password || (config.default_password as string);
+
+  // set role
+  userData.role = 'admin';
+
+  // const academicDepartment = await AcademicDepartmentModel.findById(payload.academicDepartment);
+
+  // if (!academicDepartment) {
+  //   throw new AppError(404, 'Academic Department not found');
+  // }
+
+  // transaction rollback
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+
+    // genaret Admin id
+    userData.id = await GenaretAdminId();
+
+    const newUser = await UserModel.create([userData], { session });
+
+    if (!newUser.length) {
+      throw new AppError(400, 'Faild to create User');
+    }
+
+    payload.id = newUser[0].id;
+    payload.user = newUser[0]._id;
+
+    const newAdmin = await AdminModel.create([payload], { session });
+
+    if (!newAdmin) {
+      throw new AppError(400, 'Faild to create Admin');
+    }
+
+    await session.commitTransaction();
+    await session.endSession();
+
+    return newAdmin;
+  } catch (error: any) {
+    await session.abortTransaction();
+    await session.endSession();
+
+    throw new Error(error);
+  }
+};
+
 export const UserServices = {
   createStudentIntoDB,
   createFacultyIntoDB,
+  createAdminIntoDB
 };

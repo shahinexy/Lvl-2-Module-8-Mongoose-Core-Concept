@@ -4,44 +4,44 @@
 import mongoose from 'mongoose';
 import AppError from '../../error/AppError';
 import { UserModel } from '../user/user.model';
-import { FacultyModel } from './admin.model';
-import { TFaculty } from './admin.interface';
+import { AdminModel } from './admin.model';
+import { TAdmin } from './admin.interface';
 import QueryBuilder from '../../builder/QueryBuilder';
 
-const getAllFacultysFronDB = async () => {
-  const res = await FacultyModel.find()
+const getAllAdminsFronDB = async () => {
+  const res = await AdminModel.find()
   return res;
 };
 
-const getSingleFacultyFromDB = async (id: string) => {
-  const result = await FacultyModel.findById( id )
+const getSingleAdminFromDB = async (id: string) => {
+  const result = await AdminModel.findById( id )
   return result;
 };
 
-const searchFacultyFromDB = async (query: Record<string, unknown>) => {
-  const facultySearchbleField = ['email', 'name.firstName', 'designation'];
+const searchAdminFromDB = async (query: Record<string, unknown>) => {
+  const AdminSearchbleField = ['email', 'name.firstName', 'designation'];
 
-  const facultyQuery = new QueryBuilder(
-    FacultyModel.find(),
+  const AdminQuery = new QueryBuilder(
+    AdminModel.find(),
     query
   )
-    .search(facultySearchbleField)
+    .search(AdminSearchbleField)
     .filter()
     .sort()
     .paginate()
     .fields();
 
-  const result = await facultyQuery.modelQuery;
+  const result = await AdminQuery.modelQuery;
 
   return result;
 };
 
 
-const updateFacultyInDB = async (id: string, payload: Partial<TFaculty>) => {
-  const { name, ...remainingFacultytData } = payload;
+const updateAdminInDB = async (id: string, payload: Partial<TAdmin>) => {
+  const { name, ...remainingAdmintData } = payload;
 
   const modifiedUpdatedData: Record<string, unknown> = {
-    ...remainingFacultytData,
+    ...remainingAdmintData,
   };
 
   if (name && Object.keys(name).length) {
@@ -50,7 +50,7 @@ const updateFacultyInDB = async (id: string, payload: Partial<TFaculty>) => {
     }
   }
 
-  const result = await FacultyModel.findByIdAndUpdate(
+  const result = await AdminModel.findByIdAndUpdate(
      id,
     modifiedUpdatedData,
     {
@@ -62,11 +62,11 @@ const updateFacultyInDB = async (id: string, payload: Partial<TFaculty>) => {
 };
 
 // ===== transaction & rollback ====
-const deleteFacultyFromDB = async (id: string) => {
-  const isIdExists = await FacultyModel.findById(id);
+const deleteAdminFromDB = async (id: string) => {
+  const isIdExists = await AdminModel.findById(id);
 
   if (!isIdExists) {
-    throw new AppError(400, 'This Faculty dose not exists');
+    throw new AppError(400, 'This Admin dose not exists');
   }
 
   const session = await mongoose.startSession();
@@ -74,17 +74,17 @@ const deleteFacultyFromDB = async (id: string) => {
   try {
     session.startTransaction();
 
-    const deleteFacultyt = await FacultyModel.findByIdAndUpdate(
+    const deleteAdmint = await AdminModel.findByIdAndUpdate(
        id,
       { isDeleted: true },
       { new: true, session },
     );
 
-    if (!deleteFacultyt) {
-      throw new AppError(400, 'Faild to delete Facultyt');
+    if (!deleteAdmint) {
+      throw new AppError(400, 'Faild to delete Admint');
     }
 
-    const userId = deleteFacultyt.user;
+    const userId = deleteAdmint.user;
 
     const deleteUser = await UserModel.findByIdAndUpdate(
       userId,
@@ -99,7 +99,7 @@ const deleteFacultyFromDB = async (id: string) => {
     await session.commitTransaction();
     await session.endSession();
 
-    return deleteFacultyt;
+    return deleteAdmint;
   } catch (error: any) {
     await session.abortTransaction();
     await session.endSession();
@@ -108,10 +108,10 @@ const deleteFacultyFromDB = async (id: string) => {
   }
 };
 
-export const FacultyServices = {
-  getAllFacultysFronDB,
-  getSingleFacultyFromDB,
-  searchFacultyFromDB,
-  updateFacultyInDB,
-  deleteFacultyFromDB,
+export const AdminServices = {
+  getAllAdminsFronDB,
+  getSingleAdminFromDB,
+  searchAdminFromDB,
+  updateAdminInDB,
+  deleteAdminFromDB,
 };

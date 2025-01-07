@@ -1,12 +1,12 @@
 // ========= route -> controller -> service ==========
 import sendResponse from '../../utils/sendResponse';
 import catchAsync from '../../utils/catchAsync';
-import { FacultyServices } from './admin.service';
+import { AdminServices } from './admin.service';
 
 // import studentSchema from './student.joi.validation';
 
-const getAllFacultys = catchAsync(async (req, res) => {
-  const result = await FacultyServices.getAllFacultysFronDB();
+const getAllAdmins = catchAsync(async (req, res) => {
+  const result = await AdminServices.getAllAdminsFronDB();
 
   sendResponse(res, {
     statusCode: 200,
@@ -16,59 +16,59 @@ const getAllFacultys = catchAsync(async (req, res) => {
   });
 });
 
-const getFaculty = catchAsync(async (req, res) => {
+const getAdmin = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const result = await FacultyServices.getSingleFacultyFromDB(id);
+  const result = await AdminServices.getSingleAdminFromDB(id);
 
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: 'Get single Faculty successfully',
+    message: 'Get single Admin successfully',
     data: result,
   });
 });
 
-const searchFaculty = catchAsync(async (req, res) => {
+const searchAdmin = catchAsync(async (req, res) => {
   const query = req.query;
-  const result = await FacultyServices.searchFacultyFromDB(query);
+  const result = await AdminServices.searchAdminFromDB(query);
 
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: 'Get searched Faculty successfully',
+    message: 'Get searched Admin successfully',
     data: result,
   });
 });
 
-const updateFaculty = catchAsync(async (req, res) => {
+const updateAdmin = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const { faculty } = req.body;
-  const result = await FacultyServices.updateFacultyInDB(id, faculty);
+  const { Admin } = req.body;
+  const result = await AdminServices.updateAdminInDB(id, Admin);
 
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: 'Update Faculty data successfully',
+    message: 'Update Admin data successfully',
     data: result,
   });
 });
 
-const deleteFaculty = catchAsync(async (req, res) => {
+const deleteAdmin = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const result = await FacultyServices.deleteFacultyFromDB(id);
+  const result = await AdminServices.deleteAdminFromDB(id);
 
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: 'Delete Faculty successfully',
+    message: 'Delete Admin successfully',
     data: result,
   });
 });
 
-export const FacultyControllers = {
-  getAllFacultys,
-  getFaculty,
-  searchFaculty,
-  updateFaculty,
-  deleteFaculty,
+export const AdminControllers = {
+  getAllAdmins,
+  getAdmin,
+  searchAdmin,
+  updateAdmin,
+  deleteAdmin,
 };
