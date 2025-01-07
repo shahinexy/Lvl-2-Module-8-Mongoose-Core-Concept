@@ -41,18 +41,18 @@ const searchFaculty = catchAsync(async(req,res)=>{
   });
 })
 
-// const updateFaculty = catchAsync(async (req, res) => {
-//   const { FacultyId } = req.params;
-//   const {Faculty} = req.body;
-//   const result = await FacultyServices.updateFacultyInDb(FacultyId, Faculty);
+const updateFaculty = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const {faculty} = req.body;
+  const result = await FacultyServices.updateFacultyInDB(id, faculty);
 
-//   sendResponse(res, {
-//     statusCode: 200,
-//     success: true,
-//     message: 'Update Faculty data successfully',
-//     data: result,
-//   });
-// });
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Update Faculty data successfully',
+    data: result,
+  });
+});
 
 const deleteFaculty = catchAsync(async (req, res) => {
   const { FacultyId } = req.params;
@@ -70,6 +70,6 @@ export const FacultyControllers = {
   getAllFacultys,
   getFaculty,
   searchFaculty,
-//   updateFaculty,
+  updateFaculty,
   deleteFaculty,
 };

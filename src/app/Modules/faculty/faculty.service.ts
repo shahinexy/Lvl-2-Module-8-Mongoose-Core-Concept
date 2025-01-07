@@ -6,6 +6,7 @@ import AppError from '../../error/AppError';
 import { UserModel } from '../user/user.model';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { FacultyModel } from './faculty.model';
+import { TFaculty } from './faculty.interface';
 // import { TFaculty } from './faculty.interface';
 
 const getAllFacultysFronDB = async () => {
@@ -105,35 +106,29 @@ const searchFacultyFromDB = async (query: Record<string, unknown>) => {
 //   return result;
 };
 
-// const updateFacultytInDb = async (id: string, payload: Partial<TFaculty>) => {
-//   const { name, gurdian, ...remainingFacultytData } = payload;
+const updateFacultyInDB = async (id: string, payload: Partial<TFaculty>) => {
+  const { name, ...remainingFacultytData } = payload;
 
-//   const modifiedUpdatedData: Record<string, unknown> = {
-//     ...remainingFacultytData,
-//   };
+  const modifiedUpdatedData: Record<string, unknown> = {
+    ...remainingFacultytData,
+  };
 
-//   if (name && Object.keys(name).length) {
-//     for (const [key, value] of Object.entries(name)) {
-//       modifiedUpdatedData[`name.${key}`] = value;
-//     }
-//   }
+  if (name && Object.keys(name).length) {
+    for (const [key, value] of Object.entries(name)) {
+      modifiedUpdatedData[`name.${key}`] = value;
+    }
+  }
 
-//   if (gurdian && Object.keys(gurdian).length) {
-//     for (const [key, value] of Object.entries(gurdian)) {
-//       modifiedUpdatedData[`name.${key}`] = value;
-//     }
-//   }
-
-//   const result = await FacultytModle.findOneAndUpdate(
-//     { id: id },
-//     modifiedUpdatedData,
-//     {
-//       new: true,
-//       runValidators: true,
-//     },
-//   );
-//   return result;
-// };
+  const result = await FacultyModel.findByIdAndUpdate(
+     id,
+    modifiedUpdatedData,
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
+  return result;
+};
 
 // ===== transaction & rollback ====
 const deleteFacultyFromDB = async (id: string) => {
@@ -184,6 +179,6 @@ export const FacultyServices = {
   getAllFacultysFronDB,
   getSingleFacultyFromDB,
   searchFacultyFromDB,
-//   updateFacultytInDb,
+  updateFacultyInDB,
   deleteFacultyFromDB,
 };
