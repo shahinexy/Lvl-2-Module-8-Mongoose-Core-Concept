@@ -6,7 +6,11 @@ import { Student } from '../student/student.interface';
 import { StudentModle } from '../student/student.model';
 import { TUser } from './user.interface';
 import { UserModel } from './user.model';
-import { GenaretAdminId, GenaretFacultyId, GenaretStudentId } from './user.utils';
+import {
+  GenaretAdminId,
+  GenaretFacultyId,
+  GenaretStudentId,
+} from './user.utils';
 import { TFaculty } from '../faculty/faculty.interface';
 import { AcademicDepartmentModel } from '../academicDepartment/academicDepartment.model';
 import { FacultyModel } from '../faculty/faculty.model';
@@ -86,7 +90,9 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
   // set feculty role
   userData.role = 'faculty';
 
-  const academicDepartment = await AcademicDepartmentModel.findById(payload.academicDepartment);
+  const academicDepartment = await AcademicDepartmentModel.findById(
+    payload.academicDepartment,
+  );
 
   if (!academicDepartment) {
     throw new AppError(404, 'Academic Department not found');
@@ -137,8 +143,6 @@ const createAdminIntoDB = async (password: string, payload: TAdmin) => {
   // set role
   userData.role = 'admin';
 
-  
-
   // transaction rollback
   const session = await mongoose.startSession();
 
@@ -153,12 +157,8 @@ const createAdminIntoDB = async (password: string, payload: TAdmin) => {
       throw new AppError(400, 'Faild to create User');
     }
 
-    console.log( payload);
-
     payload.id = newUser[0].id;
     payload.user = newUser[0]._id;
-
-    
 
     const newAdmin = await AdminModel.create([payload], { session });
 
@@ -181,5 +181,5 @@ const createAdminIntoDB = async (password: string, payload: TAdmin) => {
 export const UserServices = {
   createStudentIntoDB,
   createFacultyIntoDB,
-  createAdminIntoDB
+  createAdminIntoDB,
 };

@@ -42,8 +42,8 @@ const searchAdmin = catchAsync(async (req, res) => {
 
 const updateAdmin = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const { Admin } = req.body;
-  const result = await AdminServices.updateAdminInDB(id, Admin);
+  const { admin } = req.body;
+  const result = await AdminServices.updateAdminInDB(id, admin);
 
   sendResponse(res, {
     statusCode: 200,
