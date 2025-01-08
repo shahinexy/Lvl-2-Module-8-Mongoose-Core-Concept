@@ -137,11 +137,7 @@ const createAdminIntoDB = async (password: string, payload: TAdmin) => {
   // set role
   userData.role = 'admin';
 
-  // const academicDepartment = await AcademicDepartmentModel.findById(payload.academicDepartment);
-
-  // if (!academicDepartment) {
-  //   throw new AppError(404, 'Academic Department not found');
-  // }
+  
 
   // transaction rollback
   const session = await mongoose.startSession();
@@ -151,15 +147,18 @@ const createAdminIntoDB = async (password: string, payload: TAdmin) => {
 
     // genaret Admin id
     userData.id = await GenaretAdminId();
-
     const newUser = await UserModel.create([userData], { session });
 
     if (!newUser.length) {
       throw new AppError(400, 'Faild to create User');
     }
 
+    console.log( payload);
+
     payload.id = newUser[0].id;
     payload.user = newUser[0]._id;
+
+    
 
     const newAdmin = await AdminModel.create([payload], { session });
 
