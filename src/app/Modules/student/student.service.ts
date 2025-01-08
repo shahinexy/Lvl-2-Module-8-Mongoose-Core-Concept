@@ -19,7 +19,7 @@ const getAllStudentsFronDB = async () => {
 };
 
 const getSingleStudentFromDB = async (id: string) => {
-  const result = await StudentModle.findOne({ id }).populate({
+  const result = await StudentModle.findById( id ).populate({
     path: 'academicDepartment',
     populate: {
       path: 'academicFaculty',
@@ -134,8 +134,8 @@ const updateStudentInDb = async (id: string, payload: Partial<Student>) => {
     }
   }
 
-  const result = await StudentModle.findOneAndUpdate(
-    { id: id },
+  const result = await StudentModle.findByIdAndUpdate(
+     id,
     modifiedUpdatedData,
     {
       new: true,
@@ -147,7 +147,7 @@ const updateStudentInDb = async (id: string, payload: Partial<Student>) => {
 
 // ===== transaction & rollback ====
 const deleteStudentFromDB = async (id: string) => {
-  const isIdExists = await StudentModle.findOne({ id: id });
+  const isIdExists = await StudentModle.findById( id );
 
   if (!isIdExists) {
     throw new AppError(400, 'This user dose not exists');
@@ -158,8 +158,8 @@ const deleteStudentFromDB = async (id: string) => {
   try {
     session.startTransaction();
 
-    const deleteStudent = await StudentModle.findOneAndUpdate(
-      { id },
+    const deleteStudent = await StudentModle.findByIdAndUpdate(
+      id,
       { isDeleted: true },
       { new: true, session },
     );
@@ -168,8 +168,10 @@ const deleteStudentFromDB = async (id: string) => {
       throw new AppError(400, 'Faild to delete student');
     }
 
-    const deleteUser = await UserModel.findOneAndUpdate(
-      { id },
+    const userId = deleteStudent.user
+
+    const deleteUser = await UserModel.findByIdAndUpdate(
+      userId,
       { isDeleted: true },
       { new: true, session },
     );
