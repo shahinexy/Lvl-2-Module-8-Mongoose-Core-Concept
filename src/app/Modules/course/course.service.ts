@@ -9,21 +9,45 @@ const createCourseInToDB = async (payload: TCourse) => {
 const getAllCourseFromDB = async () => {
   const result = await CourseModel.find().populate({
     path: 'preRequisiteCourses',
-    populate: 'course'
+    populate: 'course',
   });
   return result;
 };
 
 const getSingleCourseFromDB = async (id: string) => {
-  const result = await CourseModel.findById(id).populate('preRequisiteCourses.course');;
+  const result = await CourseModel.findById(id).populate(
+    'preRequisiteCourses.course',
+  );
   return result;
 };
 
 const updateCourseInToDB = async (id: string, payload: Partial<TCourse>) => {
-  const result = await CourseModel.findByIdAndUpdate(id, payload, {
-    new: true,
-  });
-  return result;
+  const { preRequisiteCourses, ...remainingCourseData } = payload;
+
+  const basicCourseInfo = await CourseModel.findByIdAndUpdate(
+    id,
+    remainingCourseData,
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
+  console.log(preRequisiteCourses);
+  // Check if there is any pre requisite course to update
+  if (preRequisiteCourses && preRequisiteCourses.length > 0) {
+    const deletePreRequisite = preRequisiteCourses
+      .filter((el) => el.course && el.isDeleted)
+      .map((el) => el.course);
+    
+      const deletePreRequisiteCourses = await CourseModel.findByIdAndUpdate(
+        id,
+        {$pull:{
+          preRequisiteCourses: {course: {$in: deletePreRequisite}}
+        }}
+      )
+  }
+
+  return basicCourseInfo;
 };
 
 const deleteCourseFromDB = async (id: string) => {
