@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import AppError from '../../error/AppError';
-import { TCourse } from './course.interface';
-import { CourseModel } from './course.model';
+import { TCourse, TCoursefaculty } from './course.interface';
+import { CourseFacultyModel, CourseModel } from './course.model';
 
 const createCourseInToDB = async (payload: TCourse) => {
   const result = await CourseModel.create(payload);
@@ -116,10 +116,29 @@ const deleteCourseFromDB = async (id: string) => {
   return result;
 };
 
+const assignFacultyWithCourseIntoDB = async (
+  id: string,
+  payload: TCoursefaculty,
+) => {
+  const result = await CourseFacultyModel.findByIdAndUpdate(
+    id,
+    {
+      course: id,
+      $addToSet: { faculties: { $each: payload } },
+    },
+    {
+      upsert: true,
+      new: true,
+    },
+  );
+  return result;
+};
+
 export const CourseServices = {
   createCourseInToDB,
   getAllCourseFromDB,
   getSingleCourseFromDB,
   updateCourseInToDB,
   deleteCourseFromDB,
+  assignFacultyWithCourseIntoDB,
 };
