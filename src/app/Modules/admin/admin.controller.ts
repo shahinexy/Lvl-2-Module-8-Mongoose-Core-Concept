@@ -6,7 +6,7 @@ import { AdminServices } from './admin.service';
 // import studentSchema from './student.joi.validation';
 
 const getAllAdmins = catchAsync(async (req, res) => {
-  const result = await AdminServices.getAllAdminsFronDB();
+  const result = await AdminServices.getAllAdminsFronDB(req.query);
 
   sendResponse(res, {
     statusCode: 200,
@@ -24,18 +24,6 @@ const getAdmin = catchAsync(async (req, res) => {
     statusCode: 200,
     success: true,
     message: 'Get single Admin successfully',
-    data: result,
-  });
-});
-
-const searchAdmin = catchAsync(async (req, res) => {
-  const query = req.query;
-  const result = await AdminServices.searchAdminFromDB(query);
-
-  sendResponse(res, {
-    statusCode: 200,
-    success: true,
-    message: 'Get searched Admin successfully',
     data: result,
   });
 });
@@ -68,7 +56,6 @@ const deleteAdmin = catchAsync(async (req, res) => {
 export const AdminControllers = {
   getAllAdmins,
   getAdmin,
-  searchAdmin,
   updateAdmin,
   deleteAdmin,
 };

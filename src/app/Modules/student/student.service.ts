@@ -6,30 +6,8 @@ import { UserModel } from '../user/user.model';
 import { Student } from './student.interface';
 import QueryBuilder from '../../builder/QueryBuilder';
 
-const getAllStudentsFronDB = async () => {
-  const res = await StudentModle.find()
-    .populate('admissionSemester')
-    .populate({
-      path: 'academicDepartment',
-      populate: {
-        path: 'academicFaculty',
-      },
-    });
-  return res;
-};
-
-const getSingleStudentFromDB = async (id: string) => {
-  const result = await StudentModle.findById( id ).populate({
-    path: 'academicDepartment',
-    populate: {
-      path: 'academicFaculty',
-    },
-  });
-  return result;
-};
-
-const searchStudentFromDB = async (query: Record<string, unknown>) => {
-  // console.log('base quesry', query);
+const getAllStudentsFronDB = async (query: Record<string, unknown>) => {
+// console.log('base quesry', query);
 
   // const queryObject = { ...query };
 
@@ -115,6 +93,16 @@ const searchStudentFromDB = async (query: Record<string, unknown>) => {
   return result;
 };
 
+const getSingleStudentFromDB = async (id: string) => {
+  const result = await StudentModle.findById( id ).populate({
+    path: 'academicDepartment',
+    populate: {
+      path: 'academicFaculty',
+    },
+  });
+  return result;
+};
+
 const updateStudentInDb = async (id: string, payload: Partial<Student>) => {
   const { name, gurdian, ...remainingStudentData } = payload;
 
@@ -195,7 +183,6 @@ const deleteStudentFromDB = async (id: string) => {
 export const StudentServices = {
   getAllStudentsFronDB,
   getSingleStudentFromDB,
-  searchStudentFromDB,
   updateStudentInDb,
   deleteStudentFromDB,
 };

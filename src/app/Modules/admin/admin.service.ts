@@ -8,17 +8,7 @@ import { AdminModel } from './admin.model';
 import { TAdmin } from './admin.interface';
 import QueryBuilder from '../../builder/QueryBuilder';
 
-const getAllAdminsFronDB = async () => {
-  const res = await AdminModel.find()
-  return res;
-};
-
-const getSingleAdminFromDB = async (id: string) => {
-  const result = await AdminModel.findById( id )
-  return result;
-};
-
-const searchAdminFromDB = async (query: Record<string, unknown>) => {
+const getAllAdminsFronDB = async (query: Record<string, unknown>) => {
   const AdminSearchbleField = ['email', 'name.firstName', 'designation'];
 
   const AdminQuery = new QueryBuilder(
@@ -35,6 +25,12 @@ const searchAdminFromDB = async (query: Record<string, unknown>) => {
 
   return result;
 };
+
+const getSingleAdminFromDB = async (id: string) => {
+  const result = await AdminModel.findById( id )
+  return result;
+};
+
 
 
 const updateAdminInDB = async (id: string, payload: Partial<TAdmin>) => {
@@ -111,7 +107,6 @@ const deleteAdminFromDB = async (id: string) => {
 export const AdminServices = {
   getAllAdminsFronDB,
   getSingleAdminFromDB,
-  searchAdminFromDB,
   updateAdminInDB,
   deleteAdminFromDB,
 };

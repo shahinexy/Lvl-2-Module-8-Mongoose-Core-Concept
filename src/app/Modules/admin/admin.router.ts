@@ -9,8 +9,6 @@ const router = express.Router()
 
 router.get('/', AdminControllers.getAllAdmins)
 
-router.get('/search', AdminControllers.searchAdmin)
-
 router.get('/:id', AdminControllers.getAdmin)
 
 router.patch('/:id', valideteRequest(AdminValidations.updateAdminValidationSchema), AdminControllers.updateAdmin)

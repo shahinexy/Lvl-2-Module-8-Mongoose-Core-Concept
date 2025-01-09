@@ -10,8 +10,6 @@ const router = express.Router()
 
 router.get('/', StudentController.getAllStudents)
 
-router.get('/search', StudentController.searchStudent)
-
 router.get('/:studentId', StudentController.getStudent)
 
 router.patch('/:studentId', valideteRequest(studentValidations.updateStudentValidationSchema), StudentController.updateStudent)

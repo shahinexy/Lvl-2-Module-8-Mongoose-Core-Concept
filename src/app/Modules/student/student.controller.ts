@@ -6,7 +6,7 @@ import catchAsync from '../../utils/catchAsync';
 // import studentSchema from './student.joi.validation';
 
 const getAllStudents = catchAsync(async (req, res) => {
-  const result = await StudentServices.getAllStudentsFronDB();
+  const result = await StudentServices.getAllStudentsFronDB(req.query);
 
   // res.status(200).json({
   //   success: true,
@@ -33,18 +33,6 @@ const getStudent = catchAsync(async (req, res) => {
     data: result,
   });
 });
-
-const searchStudent = catchAsync(async(req,res)=>{
-  const query = req.query;
-  const result = await StudentServices.searchStudentFromDB(query)
-
-  sendResponse(res, {
-    statusCode: 200,
-    success: true,
-    message: 'Get searched Student successfully',
-    data: result,
-  });
-})
 
 const updateStudent = catchAsync(async (req, res) => {
   const { studentId } = req.params;
@@ -74,7 +62,6 @@ const deleteStudent = catchAsync(async (req, res) => {
 export const StudentController = {
   getAllStudents,
   getStudent,
-  searchStudent,
   updateStudent,
   deleteStudent,
 };

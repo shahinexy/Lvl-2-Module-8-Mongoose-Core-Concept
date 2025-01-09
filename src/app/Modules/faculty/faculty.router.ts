@@ -10,8 +10,6 @@ const router = express.Router()
 
 router.get('/', FacultyControllers.getAllFacultys)
 
-router.get('/search', FacultyControllers.searchFaculty)
-
 router.get('/:id', FacultyControllers.getFaculty)
 
 router.patch('/:id', valideteRequest(facultyValidations.updateFacultyValidationSchema), FacultyControllers.updateFaculty)

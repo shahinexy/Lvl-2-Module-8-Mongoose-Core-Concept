@@ -6,7 +6,7 @@ import { FacultyServices } from './faculty.service';
 // import studentSchema from './student.joi.validation';
 
 const getAllFacultys = catchAsync(async (req, res) => {
-  const result = await FacultyServices.getAllFacultysFronDB();
+  const result = await FacultyServices.getAllFacultysFronDB(req.query);
 
   sendResponse(res, {
     statusCode: 200,
@@ -24,18 +24,6 @@ const getFaculty = catchAsync(async (req, res) => {
     statusCode: 200,
     success: true,
     message: 'Get single Faculty successfully',
-    data: result,
-  });
-});
-
-const searchFaculty = catchAsync(async (req, res) => {
-  const query = req.query;
-  const result = await FacultyServices.searchFacultyFromDB(query);
-
-  sendResponse(res, {
-    statusCode: 200,
-    success: true,
-    message: 'Get searched Faculty successfully',
     data: result,
   });
 });
@@ -68,7 +56,6 @@ const deleteFaculty = catchAsync(async (req, res) => {
 export const FacultyControllers = {
   getAllFacultys,
   getFaculty,
-  searchFaculty,
   updateFaculty,
   deleteFaculty,
 };

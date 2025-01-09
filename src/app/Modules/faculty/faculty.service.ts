@@ -8,17 +8,7 @@ import { FacultyModel } from './faculty.model';
 import { TFaculty } from './faculty.interface';
 import QueryBuilder from '../../builder/QueryBuilder';
 
-const getAllFacultysFronDB = async () => {
-  const res = await FacultyModel.find()
-  return res;
-};
-
-const getSingleFacultyFromDB = async (id: string) => {
-  const result = await FacultyModel.findById( id )
-  return result;
-};
-
-const searchFacultyFromDB = async (query: Record<string, unknown>) => {
+const getAllFacultysFronDB = async (query: Record<string, unknown>) => {
   const facultySearchbleField = ['email', 'name.firstName', 'designation'];
 
   const facultyQuery = new QueryBuilder(
@@ -36,6 +26,10 @@ const searchFacultyFromDB = async (query: Record<string, unknown>) => {
   return result;
 };
 
+const getSingleFacultyFromDB = async (id: string) => {
+  const result = await FacultyModel.findById( id )
+  return result;
+};
 
 const updateFacultyInDB = async (id: string, payload: Partial<TFaculty>) => {
   const { name, ...remainingFacultytData } = payload;
@@ -111,7 +105,6 @@ const deleteFacultyFromDB = async (id: string) => {
 export const FacultyServices = {
   getAllFacultysFronDB,
   getSingleFacultyFromDB,
-  searchFacultyFromDB,
   updateFacultyInDB,
   deleteFacultyFromDB,
 };
