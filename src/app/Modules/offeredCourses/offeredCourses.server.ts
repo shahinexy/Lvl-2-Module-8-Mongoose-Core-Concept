@@ -15,6 +15,9 @@ const createOfferedCourseInDB = async (payload: TOfferedCourse) => {
     course,
     section,
     faculty,
+    days,
+    startTime,
+    endTime,
   } = payload;
 
   const isSemesterRegistrationExists =
@@ -79,6 +82,33 @@ const createOfferedCourseInDB = async (payload: TOfferedCourse) => {
       `Offered course with same section is already exist!`,
     );
   }
+
+  // get the schedules of the faculties
+  const assignedShedule = await OfferedCourseModel.find({
+    semesterRegistration,
+    faculty,
+    days: { $in: days },
+  }).select('days startTime endTime');
+  console.log(assignedShedule);
+  const newSchedule = {
+    days,
+    startTime,
+    endTime,
+  };
+
+  assignedShedule.forEach((schedule) => {
+    const existingStratTime = new Date(`1970-01-01T${schedule.startTime}`);
+    const existingEndTime = new Date(`1970-01-01T${schedule.endTime}`);
+    const newStartTime = new Date(`1970-01-01T${newSchedule.startTime}`);
+    const newEndTime = new Date(`1970-01-01T${newSchedule.endTime}`);
+
+    if (newStartTime < existingEndTime && newEndTime > existingStratTime) {
+      throw new AppError(
+        409,
+        'This faculty is not available at that time ! Choose other time or day',
+      );
+    }
+  });
 
   const result = await OfferedCourseModel.create({
     ...payload,
