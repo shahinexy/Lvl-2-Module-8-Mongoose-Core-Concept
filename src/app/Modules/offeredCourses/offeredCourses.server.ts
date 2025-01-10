@@ -1,7 +1,6 @@
 import AppError from '../../error/AppError';
 import { AcademicDepartmentModel } from '../academicDepartment/academicDepartment.model';
 import { AcademicFacultyModel } from '../academicFaculty/academicFaculty.model';
-import { AcademicSemesterModel } from '../academicSemester/academicSemester.model';
 import { CourseModel } from '../course/course.model';
 import { FacultyModel } from '../faculty/faculty.model';
 import { SemesterRegistrationModel } from '../semesterRegestration/semesterRegistration.model';
@@ -14,48 +13,77 @@ const createOfferedCourseInDB = async (payload: TOfferedCourse) => {
     academicFaculty,
     academicDepartment,
     course,
+    section,
     faculty,
   } = payload;
 
-  const isSemesterRegistrationExists = await SemesterRegistrationModel.findById(semesterRegistration);
+  const isSemesterRegistrationExists =
+    await SemesterRegistrationModel.findById(semesterRegistration);
 
-  if(!isSemesterRegistrationExists){
-    throw new AppError(404, 'Semester Registration Not Found')
+  if (!isSemesterRegistrationExists) {
+    throw new AppError(404, 'Semester Registration Not Found');
   }
 
   const academicSemester = isSemesterRegistrationExists.academicSemester;
-  
-  const isAcademicFacultyExists = await AcademicFacultyModel.findById(academicFaculty);
 
-  if(!isAcademicFacultyExists){
-    throw new AppError(404, 'Academic Faculty Not Found')
+  const isAcademicFacultyExists =
+    await AcademicFacultyModel.findById(academicFaculty);
+
+  if (!isAcademicFacultyExists) {
+    throw new AppError(404, 'Academic Faculty Not Found');
   }
 
-  // const isAcademicSemesterExists = await AcademicSemesterModel.findById(academicSemester);
+  const isAcademicDepartmentExists =
+    await AcademicDepartmentModel.findById(academicDepartment);
 
-  // if(!isAcademicSemesterExists){
-  //   throw new AppError(404, 'Semester Registration Not Found')
-  // }
-
-  const isAcademicDepartmentExists = await AcademicDepartmentModel.findById(academicDepartment);
-
-  if(!isAcademicDepartmentExists){
-    throw new AppError(404, 'Semester Registration Not Found')
+  if (!isAcademicDepartmentExists) {
+    throw new AppError(404, 'Semester Registration Not Found');
   }
 
   const isCourseExists = await CourseModel.findById(course);
 
-  if(!isCourseExists){
-    throw new AppError(404, 'Course Not Found')
+  if (!isCourseExists) {
+    throw new AppError(404, 'Course Not Found');
   }
 
   const isFacultyExists = await FacultyModel.findById(faculty);
 
-  if(!isFacultyExists){
-    throw new AppError(404, 'Faculty Not Found')
+  if (!isFacultyExists) {
+    throw new AppError(404, 'Faculty Not Found');
   }
 
-  const result = await OfferedCourseModel.create({...payload, academicSemester});
+  // check if the department is belong to the faculty
+  const isDepartmentBelongToFaculty = await AcademicDepartmentModel.findOne({
+    _id: academicDepartment,
+    academicFaculty,
+  });
+
+  if (!isDepartmentBelongToFaculty) {
+    throw new AppError(
+      400,
+      `This ${isAcademicDepartmentExists.name} is not  belong to this ${isAcademicFacultyExists.name}`,
+    );
+  }
+
+  // check if the same offered course same section in same registered semester exists
+  const isSameOfferedCourseExistsWithSameRegisteredSemesterWithSameSection =
+    await OfferedCourseModel.findOne({
+      semesterRegistration,
+      section,
+      course,
+    });
+
+  if (isSameOfferedCourseExistsWithSameRegisteredSemesterWithSameSection) {
+    throw new AppError(
+      400,
+      `Offered course with same section is already exist!`,
+    );
+  }
+
+  const result = await OfferedCourseModel.create({
+    ...payload,
+    academicSemester,
+  });
   return result;
 };
 
