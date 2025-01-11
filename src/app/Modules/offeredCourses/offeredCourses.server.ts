@@ -117,16 +117,15 @@ const getAllOfferedCourseFromDB = async () => {
 };
 
 const getSingleOfferedCourseFromDB = async (id: string) => {
-  const result = await OfferedCourseModel.findOne({ _id: id });
+  const result = await OfferedCourseModel.findById(id);
   return result;
 };
 
 const updateSingleOfferedCourseFromDB = async (
   id: string,
-  payload: Pick<TOfferedCourse, 'faculty'| 'days'| 'startTime' | 'endTime'>,
+  payload: Pick<TOfferedCourse, 'faculty' | 'days' | 'startTime' | 'endTime'>,
 ) => {
-
-  const {faculty, days, startTime, endTime} = payload;
+  const { faculty, days, startTime, endTime } = payload;
 
   const isOfferedCourseExists = await OfferedCourseModel.findById(id);
 
@@ -140,39 +139,58 @@ const updateSingleOfferedCourseFromDB = async (
     throw new AppError(404, 'Faculty Not Found');
   }
 
-  const semesterRegistration = isOfferedCourseExists.semesterRegistration
+  const semesterRegistration = isOfferedCourseExists.semesterRegistration;
 
-  const selecteSemesterRegistrationStatus = await SemesterRegistrationModel.findById(semesterRegistration)
+  const selecteSemesterRegistrationStatus =
+    await SemesterRegistrationModel.findById(semesterRegistration);
 
-  if(selecteSemesterRegistrationStatus?.status !== 'UPCOMING'){
-    throw new AppError(400, `You can not update this offered course as it is ${selecteSemesterRegistrationStatus?.status}`)
+  if (selecteSemesterRegistrationStatus?.status !== 'UPCOMING') {
+    throw new AppError(
+      400,
+      `You can not update this offered course as it is ${selecteSemesterRegistrationStatus?.status}`,
+    );
   }
 
-    // get the schedules of the faculties
-    const assignedShedule = await OfferedCourseModel.find({
-      semesterRegistration,
-      faculty,
-      days: { $in: days },
-    }).select('days startTime endTime');
+  // get the schedules of the faculties
+  const assignedShedule = await OfferedCourseModel.find({
+    semesterRegistration,
+    faculty,
+    days: { $in: days },
+  }).select('days startTime endTime');
 
-    const newSchedule = {
-      days,
-      startTime,
-      endTime,
-    };
+  const newSchedule = {
+    days,
+    startTime,
+    endTime,
+  };
 
-  if(hasTimeConflict(assignedShedule, newSchedule)){
+  if (hasTimeConflict(assignedShedule, newSchedule)) {
     throw new AppError(
       409,
       'This faculty is not available at that time ! Choose other time or day',
     );
   }
 
-  const result = await OfferedCourseModel.findByIdAndUpdate(
-    id,
-    payload,
-    { new: true },
-  );
+  const result = await OfferedCourseModel.findByIdAndUpdate(id, payload, {
+    new: true,
+  });
+  return result;
+};
+
+const deleteOfferedCourseFromDB = async (id: string) => {
+  const isOfferedCourseExists = await OfferedCourseModel.findById(id);
+
+  if (!isOfferedCourseExists) {
+    throw new AppError(404, 'Offered Course Not Found');
+  }
+
+  const semesterRegistration = await SemesterRegistrationModel.findById(isOfferedCourseExists.semesterRegistration)
+
+  if(semesterRegistration?.status !== "UPCOMING"){
+    throw new AppError(400, `Offered course can not update ! because the semester ${semesterRegistration?.status}`);
+  }
+
+  const result = await OfferedCourseModel.findByIdAndDelete(id);
   return result;
 };
 
@@ -181,4 +199,5 @@ export const OfferedCourseServices = {
   getAllOfferedCourseFromDB,
   getSingleOfferedCourseFromDB,
   updateSingleOfferedCourseFromDB,
+  deleteOfferedCourseFromDB
 };
