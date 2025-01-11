@@ -1,6 +1,8 @@
+import mongoose from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/AppError';
 import { AcademicSemesterModel } from '../academicSemester/academicSemester.model';
+import { OfferedCourseModel } from '../offeredCourses/offeredCourses.model';
 import { RegistrationStatus } from './semesterRegistration.constent';
 import { TSemesterRegistration } from './semesterRegistration.interface';
 import { SemesterRegistrationModel } from './semesterRegistration.model';
@@ -117,9 +119,59 @@ const updateSemesterRegistersFromDB = async (
   return result;
 };
 
+const deleteSemesterRegistersFromDB = async (id: string) => {
+  const isSemesterRegisterExists = await SemesterRegistrationModel.findById(id);
+
+  if (!isSemesterRegisterExists) {
+    throw new AppError(404, 'Semester Registration Not Found');
+  }
+
+  if (isSemesterRegisterExists?.status !== 'UPCOMING') {
+    throw new AppError(
+      400,
+      `Semester Registration can not delete ! because the semester ${isSemesterRegisterExists?.status}`,
+    );
+  }
+
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+
+    const deleteOfferedCourses = await OfferedCourseModel.deleteMany(
+      { semesterRegistration: id },
+      { session },
+    );
+
+    if (!deleteOfferedCourses) {
+      throw new AppError(400, 'Faild to delete Offered Courses');
+    }
+
+    const deleterSemesterRegistration =
+      await SemesterRegistrationModel.findByIdAndDelete(id, {
+        session,
+        new: true,
+      });
+
+    if (!deleterSemesterRegistration) {
+      throw new AppError(400, 'Faild to delete Semester Register');
+    }
+
+    session.commitTransaction();
+    session.endSession();
+
+    return deleterSemesterRegistration;
+  } catch (error: any) {
+    session.abortTransaction();
+    session.endSession();
+    throw new Error(error);
+  }
+};
+
 export const semesterRegistrationServices = {
   createSemesterRegestrationIntoDB,
   getAllSemesterRegistersFromDB,
   getSingleSemesterRegistersFromDB,
   updateSemesterRegistersFromDB,
+  deleteSemesterRegistersFromDB,
 };
