@@ -6,12 +6,13 @@ import { FacultyServices } from './faculty.service';
 // import studentSchema from './student.joi.validation';
 
 const getAllFacultys = catchAsync(async (req, res) => {
+  console.log('test', req.user);
   const result = await FacultyServices.getAllFacultysFronDB(req.query);
 
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: 'Student are retrieved successfully',
+    message: 'Faculty are retrieved successfully',
     data: result,
   });
 });
