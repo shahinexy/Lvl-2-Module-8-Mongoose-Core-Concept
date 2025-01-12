@@ -19,12 +19,14 @@ router.post(
 
 router.post(
   '/create-faculty',
+  auth(USER_ROLE.admin),
   valideteRequest(facultyValidations.createFacultyValidationSchema),
   UsreControllers.createFaculty,
 );
 
 router.post(
   '/create-admin',
+  // auth(USER_ROLE.admin),
   valideteRequest(AdminValidations.createAdminValidationSchema),
   UsreControllers.createAdmin,
 );
