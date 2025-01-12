@@ -73,6 +73,7 @@ const getAllStudentsFronDB = async (query: Record<string, unknown>) => {
 
   const studentQuery = new QueryBuilder(
     StudentModle.find()
+    .populate('user')
       .populate('admissionSemester')
       .populate({
         path: 'academicDepartment',

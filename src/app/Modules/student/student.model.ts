@@ -52,7 +52,7 @@ const studentSchema = new Schema<Student, ModelOfStudent>({
     type: Schema.Types.ObjectId,
     required: [true, "User id is required"],
     unique: true,
-    ref: "User"
+    ref: "User",
   },
   name: {type: userNameSchema, required: true},
   gender: {
