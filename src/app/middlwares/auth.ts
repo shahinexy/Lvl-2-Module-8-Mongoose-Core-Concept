@@ -1,12 +1,28 @@
 import { NextFunction, Request, Response } from 'express';
-import { AnyZodObject } from 'zod';
 import catchAsync from '../utils/catchAsync';
+import AppError from '../error/AppError';
+import jwt, { JwtPayload } from 'jsonwebtoken';
+import config from '../config';
 
-const valideteRequest = (schema: AnyZodObject) => {
-  return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    await schema.parseAsync({ body: req.body });
+
+const auth = () => {
+  return catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    const token = req.headers.authorization;
+
+    if (!token) {
+      throw new AppError(401, 'You are not authorize');
+    }
+
+    // check token is valid
+    const decoded = jwt.verify(token, config.jwt_access_secret as string) as JwtPayload;
+    console.log(decoded);
+
+    const { role, userId, iat } = decoded;
+
+    req.user = decoded as JwtPayload ;
+
     next();
   });
 };
 
-export default valideteRequest;
+export default auth;

@@ -1,3 +1,4 @@
+import { USER_ROLE } from "./user.constant";
 
 
 export type TUser = {
@@ -8,3 +9,5 @@ role: "admin" | "student" | "faculty";
 status: "in-progress" | "blocked";
 isDeleted: boolean
 }
+
+export type TUserRole = keyof typeof USER_ROLE
