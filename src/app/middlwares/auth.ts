@@ -47,11 +47,20 @@ const auth = (...requiredRole: TUserRole[]) => {
       }
 
       // check when password changed
-      const passwordChangedAt = isUserExists?.passwordChangedAt;
+      // const passwordChangedAt = isUserExists?.passwordChangedAt;
 
-      const passwordChangedTime = passwordChangedAt ? new Date(passwordChangedAt as Date).getTime() / 1000 : 0;
+      // const passwordChangedTime = passwordChangedAt ? new Date(passwordChangedAt as Date).getTime() / 1000 : 0;
 
-      if(passwordChangedTime && passwordChangedTime > iat as number){
+      // if(passwordChangedTime && passwordChangedTime > iat as number){
+      //   throw new AppError(401, 'You are not authorize');
+      // }
+
+      if(isUserExists.passwordChangedAt &&
+        UserModel.isJwtIssuedBeforePasswordChanged(
+          isUserExists.passwordChangedAt,
+          iat as number
+        )
+      ){
         throw new AppError(401, 'You are not authorize');
       }
 
