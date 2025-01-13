@@ -46,6 +46,16 @@ const auth = (...requiredRole: TUserRole[]) => {
         throw new AppError(403, 'This user is Bolocked');
       }
 
+      // check when password changed
+      const passwordChangedAt = isUserExists?.passwordChangedAt;
+
+      const passwordChangedTime = passwordChangedAt ? new Date(passwordChangedAt as Date).getTime() / 1000 : 0;
+
+      if(passwordChangedTime && passwordChangedTime > iat as number){
+        throw new AppError(401, 'You are not authorize');
+      }
+
+       // Check for role-based access
       if (requiredRole && !requiredRole.includes(role)) {
         throw new AppError(401, 'You are not authorize');
       }
