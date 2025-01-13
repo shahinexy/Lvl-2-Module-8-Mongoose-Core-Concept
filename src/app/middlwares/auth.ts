@@ -8,7 +8,7 @@ import { UserModel } from '../Modules/user/user.model';
 
 const auth = (...requiredRole: TUserRole[]) => {
   return catchAsync(
-    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    async (req: Request, res: Response, next: NextFunction) => {
       const token = req.headers.authorization;
 
       if (!token) {

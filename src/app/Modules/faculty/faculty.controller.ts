@@ -6,6 +6,7 @@ import { FacultyServices } from './faculty.service';
 // import studentSchema from './student.joi.validation';
 
 const getAllFacultys = catchAsync(async (req, res) => {
+  console.log('Cookies', req.cookies);
   const result = await FacultyServices.getAllFacultysFronDB(req.query);
 
   sendResponse(res, {
