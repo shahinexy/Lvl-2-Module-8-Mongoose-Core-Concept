@@ -5,6 +5,7 @@ import { TLoginUser } from './auth.interface';
 import bcrypt from 'bcrypt';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { CreateToken } from './auth.utils';
+import { sendEmail } from '../../utils/sendEmail';
 
 const loginUser = async (payload: TLoginUser) => {
   // check if user exists
@@ -127,8 +128,7 @@ const changePassword = async (
   return null;
 };
 
-const refreshToken = async (token: string)=>{
-
+const refreshToken = async (token: string) => {
   if (!token) {
     throw new AppError(401, 'You are not authorize 1');
   }
@@ -165,12 +165,13 @@ const refreshToken = async (token: string)=>{
   }
 
   // check if password changed
-  if(isUserExists.passwordChangedAt &&
+  if (
+    isUserExists.passwordChangedAt &&
     UserModel.isJwtIssuedBeforePasswordChanged(
       isUserExists.passwordChangedAt,
-      iat as number
+      iat as number,
     )
-  ){
+  ) {
     throw new AppError(401, 'You are not authorize');
   }
 
@@ -186,13 +187,55 @@ const refreshToken = async (token: string)=>{
   );
 
   return {
-    accessToken
+    accessToken,
+  };
+};
+
+const forgetPassword = async (userId: string) => {
+  // check if user exists
+  const isUserExists = await UserModel.findOne({ id: userId }).select(
+    '+password',
+  );
+
+  if (!isUserExists) {
+    throw new AppError(404, 'This user is not found');
   }
 
-}
+  // check if user is already delete
+  const isDelete = isUserExists.isDeleted;
+
+  if (isDelete) {
+    throw new AppError(403, 'This user is deleted');
+  }
+
+  // check if the use is blocked
+  const userStatus = isUserExists.status;
+
+  if (userStatus === 'blocked') {
+    throw new AppError(403, 'This user is Bolocked');
+  }
+
+  const jwtPayload = {
+    userId: isUserExists.id,
+    role: isUserExists.role,
+  };
+
+  const resetToken = CreateToken(
+    jwtPayload,
+    config.jwt_access_secret as string,
+    '10m',
+  );
+
+  const resetLink = `${config.reset_password_ui_link}?id=${isUserExists.id}&token=${resetToken}`;
+
+  sendEmail(isUserExists.email, resetLink)
+
+  console.log(resetLink);
+};
 
 export const AuthServices = {
   loginUser,
   changePassword,
-  refreshToken
+  refreshToken,
+  forgetPassword,
 };

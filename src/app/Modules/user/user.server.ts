@@ -32,6 +32,8 @@ const createStudentIntoDB = async (password: string, payload: Student) => {
 
   // set student role
   userData.role = 'student';
+  // set email
+  userData.email = payload.email;
 
   //
   const admissionSemester = await AcademicSemesterModel.findById(
@@ -89,6 +91,8 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
 
   // set feculty role
   userData.role = 'faculty';
+  // set email
+  userData.email = payload.email;
 
   const academicDepartment = await AcademicDepartmentModel.findById(
     payload.academicDepartment,
@@ -142,6 +146,8 @@ const createAdminIntoDB = async (password: string, payload: TAdmin) => {
 
   // set role
   userData.role = 'admin';
+  // set email
+  userData.email = payload.email;
 
   // transaction rollback
   const session = await mongoose.startSession();
