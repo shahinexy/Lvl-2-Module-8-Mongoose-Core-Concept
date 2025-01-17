@@ -228,9 +228,37 @@ const forgetPassword = async (userId: string) => {
 
   const resetLink = `${config.reset_password_ui_link}?id=${isUserExists.id}&token=${resetToken}`;
 
-  sendEmail(isUserExists.email, resetLink)
+  sendEmail(isUserExists.email, resetLink);
 
   console.log(resetLink);
+};
+
+const resetPassword = async (
+  payload: { id: string; newPassword: string },
+  token: string,
+) => {
+  // check if user exists
+  const isUserExists = await UserModel.findOne({ id: payload.id }).select(
+    '+password',
+  );
+
+  if (!isUserExists) {
+    throw new AppError(404, 'This user is not found');
+  }
+
+  // check if user is already delete
+  const isDelete = isUserExists.isDeleted;
+
+  if (isDelete) {
+    throw new AppError(403, 'This user is deleted');
+  }
+
+  // check if the use is blocked
+  const userStatus = isUserExists.status;
+
+  if (userStatus === 'blocked') {
+    throw new AppError(403, 'This user is Bolocked');
+  }
 };
 
 export const AuthServices = {
@@ -238,4 +266,5 @@ export const AuthServices = {
   changePassword,
   refreshToken,
   forgetPassword,
+  resetPassword,
 };
