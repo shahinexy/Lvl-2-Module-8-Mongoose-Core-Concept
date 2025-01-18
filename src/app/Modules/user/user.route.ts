@@ -1,5 +1,5 @@
 // ========= route -> controller -> service ==========
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import { UsreControllers } from './user.controller';
 import { studentValidations } from '../student/student.validation';
 import valideteRequest from '../../middlwares/validetRequest';
@@ -8,12 +8,18 @@ import { AdminValidations } from '../admin/admin.validation';
 import auth from '../../middlwares/auth';
 import { USER_ROLE } from './user.constant';
 import { UserValidation } from './user.validation';
+import { upload } from '../../utils/sendImageToCloudinary';
 
 const router = express.Router();
 
 router.post(
   '/create-student',
   auth(USER_ROLE.admin),
+  upload.single('file'),
+  (req: Request, res: Response, next: NextFunction)=>{
+    req.body = JSON.parse(req.body.data)
+    next()
+  },
   valideteRequest(studentValidations.createStudentValidationSchema),
   UsreControllers.createStudent,
 );

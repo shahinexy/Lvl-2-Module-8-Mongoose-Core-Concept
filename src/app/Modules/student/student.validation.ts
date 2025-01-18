@@ -56,9 +56,7 @@ const createStudentValidationSchema = z.object({
       gender: z.enum(['female', 'male'], {
         errorMap: () => ({ message: 'Gender must be either female or male' }),
       }),
-      dateOfBirth: z
-        .string()
-        .optional(),
+      dateOfBirth: z.string().optional(),
       email: z
         .string()
         .nonempty({ message: 'Email is required' })
@@ -80,18 +78,17 @@ const createStudentValidationSchema = z.object({
         .nonempty({ message: 'Emergency number is required' })
         .transform((value) => value.trim()),
       gurdian: guardianSchema,
-      profileImg: z
-      .string()
-      .default('')
-      .transform((value) => value.trim()),
+      // profileImg: z
+      // .string()
+      // .default('')
+      // .transform((value) => value.trim()),
       admissionSemester: z.string(),
       academicDepartment: z.string(),
     }),
   }),
 });
 
-
-// for update 
+// for update
 
 const updateUserNameSchema = z.object({
   firstName: z
@@ -195,8 +192,7 @@ const updateStudentValidationSchema = z.object({
   }),
 });
 
-
 export const studentValidations = {
   createStudentValidationSchema,
-  updateStudentValidationSchema
+  updateStudentValidationSchema,
 };
