@@ -69,7 +69,7 @@ const resetPassword = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: 'Reset link is generated succesfully!',
+    message: 'Password reset succesfully!',
     data: result,
   });
 });

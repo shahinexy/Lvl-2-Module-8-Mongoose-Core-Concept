@@ -184,8 +184,33 @@ const createAdminIntoDB = async (password: string, payload: TAdmin) => {
   }
 };
 
+const changeStatus = async (id: string, payload: { status: string }) => {
+  const result = await UserModel.findByIdAndUpdate(id, payload, {
+    new: true,
+  });
+  return result;
+};
+
+const getMe = async (userId: string, role: string) => {
+  let result = null;
+  if (role === 'student') {
+    result = await StudentModle.findOne({ id: userId }).populate('user');
+  }
+  if (role === 'admin') {
+    result = await AdminModel.findOne({ id: userId }).populate('user');
+  }
+
+  if (role === 'faculty') {
+    result = await FacultyModel.findOne({ id: userId }).populate('user');
+  }
+
+  return result;
+};
+
 export const UserServices = {
   createStudentIntoDB,
   createFacultyIntoDB,
   createAdminIntoDB,
+  changeStatus,
+  getMe,
 };
