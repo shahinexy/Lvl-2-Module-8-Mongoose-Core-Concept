@@ -5,6 +5,8 @@ import { OfferedCourseModel } from '../offeredCourses/offeredCourses.model';
 import { StudentModle } from '../student/student.model';
 import { TEnrolledCourse } from './enrolledCourse.interface';
 import EnrolledCourseModel from './enrolledCourse.model';
+import { SemesterRegistrationModel } from '../semesterRegestration/semesterRegistration.model';
+import { CourseModel } from '../course/course.model';
 
 const createEnrolledCourseIntoDB = async (
   userId: string,
@@ -36,6 +38,52 @@ const createEnrolledCourseIntoDB = async (
 
   if (isStudentAlreadyEnrolled) {
     throw new AppError(400, 'Student is already enrolled !');
+  }
+
+  const course = await CourseModel.findById(isOfferedCourseExists.course);
+  const currentCredit = course?.credits
+  // check total credits exceeds maxCredit
+  const semesterRegistration = await SemesterRegistrationModel.findById(
+    isOfferedCourseExists.semesterRegistration,
+  ).select('maxCredit');
+
+  const maxCredit = semesterRegistration?.maxCredit;
+
+  const enrolledCourses = await EnrolledCourseModel.aggregate([
+    {
+      $match: {
+        semesterRegistration: isOfferedCourseExists.semesterRegistration,
+        student: student._id,
+      },
+    },
+    {
+      $lookup: {
+        from: 'courses',
+        localField: 'course',
+        foreignField: '_id',
+        as: 'enrolledCourseData',
+      },
+    },
+    {
+      $unwind: '$enrolledCourseData',
+    },
+    {
+      $group: {
+        _id: null,
+        totalEnrolledcredits: { $sum: '$enrolledCourseData.credits' },
+      },
+    },
+    {
+      $project: { _id: 0, totalEnrolledcredits: 1 },
+    },
+  ]);
+  
+  //  total enrolled credits + new enrolled course credit > maxCredit
+  const totalCredits =
+    enrolledCourses.length > 0 ? enrolledCourses[0].totalEnrolledcredits : 0;
+
+  if (totalCredits && maxCredit && totalCredits + currentCredit > maxCredit) {
+    throw new AppError(404, 'You have exceeded maximum number of credits !');
   }
 
   const session = await mongoose.startSession();
