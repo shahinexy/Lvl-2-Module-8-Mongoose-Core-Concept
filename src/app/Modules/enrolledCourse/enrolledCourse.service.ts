@@ -172,7 +172,7 @@ const updateEnrolledCourseMarksIntoDB = async (
     throw new AppError(status.FORBIDDEN, 'You are forbidden! !');
   }
 
-  const modificationData: Record<string, unknown> = { courseMarks };
+  const modificationData: Record<string, unknown> = { ...courseMarks };
 
   if (courseMarks && Object.keys(courseMarks).length) {
     for (const [key, value] of Object.entries(courseMarks)) {
