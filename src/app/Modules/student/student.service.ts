@@ -8,7 +8,7 @@ import { Student } from './student.interface';
 import QueryBuilder from '../../builder/QueryBuilder';
 
 const getAllStudentsFronDB = async (query: Record<string, unknown>) => {
-// console.log('base quesry', query);
+  // console.log('base quesry', query);
 
   // const queryObject = { ...query };
 
@@ -74,7 +74,7 @@ const getAllStudentsFronDB = async (query: Record<string, unknown>) => {
 
   const studentQuery = new QueryBuilder(
     StudentModle.find()
-    .populate('user')
+      .populate('user')
       .populate('admissionSemester')
       .populate({
         path: 'academicDepartment',
@@ -90,13 +90,17 @@ const getAllStudentsFronDB = async (query: Record<string, unknown>) => {
     .paginate()
     .fields();
 
+  const meta = await studentQuery.cuntTotal();
   const result = await studentQuery.modelQuery;
 
-  return result;
+  return {
+    meta,
+    result,
+  };
 };
 
 const getSingleStudentFromDB = async (id: string) => {
-  const result = await StudentModle.findById( id ).populate({
+  const result = await StudentModle.findById(id).populate({
     path: 'academicDepartment',
     populate: {
       path: 'academicFaculty',
@@ -124,20 +128,16 @@ const updateStudentInDb = async (id: string, payload: Partial<Student>) => {
     }
   }
 
-  const result = await StudentModle.findByIdAndUpdate(
-     id,
-    modifiedUpdatedData,
-    {
-      new: true,
-      runValidators: true,
-    },
-  );
+  const result = await StudentModle.findByIdAndUpdate(id, modifiedUpdatedData, {
+    new: true,
+    runValidators: true,
+  });
   return result;
 };
 
 // ===== transaction & rollback ====
 const deleteStudentFromDB = async (id: string) => {
-  const isIdExists = await StudentModle.findById( id );
+  const isIdExists = await StudentModle.findById(id);
 
   if (!isIdExists) {
     throw new AppError(400, 'This user dose not exists');
@@ -158,7 +158,7 @@ const deleteStudentFromDB = async (id: string) => {
       throw new AppError(400, 'Faild to delete student');
     }
 
-    const userId = deleteStudent.user
+    const userId = deleteStudent.user;
 
     const deleteUser = await UserModel.findByIdAndUpdate(
       userId,

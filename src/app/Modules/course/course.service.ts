@@ -2,18 +2,26 @@ import mongoose from 'mongoose';
 import AppError from '../../error/AppError';
 import { TCourse, TCoursefaculty } from './course.interface';
 import { CourseFacultyModel, CourseModel } from './course.model';
+import QueryBuilder from '../../builder/QueryBuilder';
 
 const createCourseInToDB = async (payload: TCourse) => {
   const result = await CourseModel.create(payload);
   return result;
 };
 
-const getAllCourseFromDB = async () => {
-  const result = await CourseModel.find().populate({
-    path: 'preRequisiteCourses',
-    populate: 'course',
-  });
-  return result;
+const getAllCourseFromDB = async (query: Record<string, unknown>) => {
+  const courseQuery = new QueryBuilder(
+    CourseModel.find().populate({
+      path: 'preRequisiteCourses',
+      populate: 'course',
+    }),
+    query,
+  );
+
+  const meta = await courseQuery.cuntTotal();
+  const result = await courseQuery.modelQuery;
+
+  return { meta, result };
 };
 
 const getSingleCourseFromDB = async (id: string) => {
@@ -141,7 +149,7 @@ const removeFacultyFromCourseFromDB = async (
   const result = await CourseFacultyModel.findByIdAndUpdate(
     id,
     {
-      $pull: {faculties: {$in: payload}},
+      $pull: { faculties: { $in: payload } },
     },
     {
       new: true,
@@ -157,5 +165,5 @@ export const CourseServices = {
   updateCourseInToDB,
   deleteCourseFromDB,
   assignFacultyWithCourseIntoDB,
-  removeFacultyFromCourseFromDB
+  removeFacultyFromCourseFromDB,
 };
