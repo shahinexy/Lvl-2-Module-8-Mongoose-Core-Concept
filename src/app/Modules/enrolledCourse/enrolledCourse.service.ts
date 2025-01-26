@@ -9,6 +9,7 @@ import { SemesterRegistrationModel } from '../semesterRegestration/semesterRegis
 import { CourseModel } from '../course/course.model';
 import status from 'http-status';
 import { FacultyModel } from '../faculty/faculty.model';
+import { calculateGratePoints } from './enrolledCourse.utils';
 
 const createEnrolledCourseIntoDB = async (
   userId: string,
@@ -173,6 +174,22 @@ const updateEnrolledCourseMarksIntoDB = async (
   }
 
   const modificationData: Record<string, unknown> = { ...courseMarks };
+
+  if (courseMarks?.finalTerm) {
+    const { classTest1, midTerm, classTest2, finalTerm } =
+      isCourseBelongToFaculty.courseMarks;
+
+    const totalMarks =
+      Math.ceil(classTest1 * 0.1) +
+      Math.ceil(midTerm * 0.3) +
+      Math.ceil(classTest2 * 0.1) +
+      Math.ceil(finalTerm * 0.5);
+
+    const result = calculateGratePoints(totalMarks);
+    modificationData.grade = result.grade;
+    modificationData.gradePoints = result.gradePoint;
+    modificationData.isCompleted = true;
+  }
 
   if (courseMarks && Object.keys(courseMarks).length) {
     for (const [key, value] of Object.entries(courseMarks)) {
