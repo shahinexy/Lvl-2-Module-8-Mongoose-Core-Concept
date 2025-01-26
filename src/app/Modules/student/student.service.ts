@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // ========= route -> controller -> service ==========
 import mongoose from 'mongoose';
 import { StudentModle } from './student.model';

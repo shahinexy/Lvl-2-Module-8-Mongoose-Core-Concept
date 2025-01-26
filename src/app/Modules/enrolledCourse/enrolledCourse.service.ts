@@ -7,6 +7,8 @@ import { TEnrolledCourse } from './enrolledCourse.interface';
 import EnrolledCourseModel from './enrolledCourse.model';
 import { SemesterRegistrationModel } from '../semesterRegestration/semesterRegistration.model';
 import { CourseModel } from '../course/course.model';
+import status from 'http-status';
+import { FacultyModel } from '../faculty/faculty.model';
 
 const createEnrolledCourseIntoDB = async (
   userId: string,
@@ -18,17 +20,17 @@ const createEnrolledCourseIntoDB = async (
     await OfferedCourseModel.findById(offeredCourse);
 
   if (!isOfferedCourseExists) {
-    throw new AppError(404, 'Offered course not found !');
+    throw new AppError(status.NOT_FOUND, 'Offered course not found !');
   }
 
   if (isOfferedCourseExists.maxCapacity <= 0) {
-    throw new AppError(400, 'Room is full !');
+    throw new AppError(status.BAD_GATEWAY, 'Room is full !');
   }
 
   const student = await StudentModle.findOne({ id: userId }, { _id: 1 });
 
   if (!student) {
-    throw new AppError(404, 'Student not found !');
+    throw new AppError(status.NOT_FOUND, 'Student not found !');
   }
   const isStudentAlreadyEnrolled = await EnrolledCourseModel.findOne({
     semesterRegistration: isOfferedCourseExists?.semesterRegistration,
@@ -37,11 +39,11 @@ const createEnrolledCourseIntoDB = async (
   });
 
   if (isStudentAlreadyEnrolled) {
-    throw new AppError(400, 'Student is already enrolled !');
+    throw new AppError(status.BAD_GATEWAY, 'Student is already enrolled !');
   }
 
   const course = await CourseModel.findById(isOfferedCourseExists.course);
-  const currentCredit = course?.credits
+  const currentCredit = course?.credits;
   // check total credits exceeds maxCredit
   const semesterRegistration = await SemesterRegistrationModel.findById(
     isOfferedCourseExists.semesterRegistration,
@@ -77,7 +79,7 @@ const createEnrolledCourseIntoDB = async (
       $project: { _id: 0, totalEnrolledcredits: 1 },
     },
   ]);
-  
+
   //  total enrolled credits + new enrolled course credit > maxCredit
   const totalCredits =
     enrolledCourses.length > 0 ? enrolledCourses[0].totalEnrolledcredits : 0;
@@ -128,6 +130,68 @@ const createEnrolledCourseIntoDB = async (
   }
 };
 
+const updateEnrolledCourseMarksIntoDB = async (
+  facultyId: string,
+  payload: Partial<TEnrolledCourse>,
+) => {
+  const { semesterRegistration, offeredCourse, student, courseMarks } = payload;
+
+  const isSemesterRegistrationExists =
+    await SemesterRegistrationModel.findById(semesterRegistration);
+
+  if (!isSemesterRegistrationExists) {
+    throw new AppError(status.NOT_FOUND, 'Semester registration not found !');
+  }
+
+  const isOfferedCourseExists =
+    await OfferedCourseModel.findById(offeredCourse);
+
+  if (!isOfferedCourseExists) {
+    throw new AppError(status.NOT_FOUND, 'Offered course not found !');
+  }
+  const isStudentExists = await StudentModle.findById(student);
+
+  if (!isStudentExists) {
+    throw new AppError(status.NOT_FOUND, 'Student not found !');
+  }
+
+  const faculty = await FacultyModel.findOne({ id: facultyId }, { _id: 1 });
+
+  if (!faculty) {
+    throw new AppError(status.NOT_FOUND, 'Faculty not found !');
+  }
+
+  const isCourseBelongToFaculty = await EnrolledCourseModel.findOne({
+    semesterRegistration,
+    offeredCourse,
+    student,
+    faculty: faculty._id,
+  });
+
+  if (!isCourseBelongToFaculty) {
+    throw new AppError(status.FORBIDDEN, 'You are forbidden! !');
+  }
+
+  const modificationData: Record<string, unknown> = { courseMarks };
+
+  if (courseMarks && Object.keys(courseMarks).length) {
+    for (const [key, value] of Object.entries(courseMarks)) {
+      modificationData[`courseMarks.${key}`] = value;
+    }
+  }
+
+  const result = await EnrolledCourseModel.findByIdAndUpdate(
+    isCourseBelongToFaculty._id,
+    modificationData,
+    {
+      new: true,
+    },
+  );
+
+  return result;
+};
+
 export const EnrolledCourseServices = {
   createEnrolledCourseIntoDB,
+  updateEnrolledCourseMarksIntoDB,
 };
