@@ -12,18 +12,27 @@ const router = express.Router();
 
 router.get(
   '/',
-  auth(USER_ROLE.admin, USER_ROLE.faculty),
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.faculty),
   FacultyControllers.getAllFacultys,
 );
 
-router.get('/:id', FacultyControllers.getFaculty);
+router.get(
+  '/:id',
+  auth('superAdmin', 'admin', 'faculty'),
+  FacultyControllers.getFaculty,
+);
 
 router.patch(
   '/:id',
+  auth('superAdmin', 'admin'),
   valideteRequest(facultyValidations.updateFacultyValidationSchema),
   FacultyControllers.updateFaculty,
 );
 
-router.delete('/:id', FacultyControllers.deleteFaculty);
+router.delete(
+  '/:id',
+  auth('superAdmin', 'admin'),
+  FacultyControllers.deleteFaculty,
+);
 
 export const FacultyRouters = router;

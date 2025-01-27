@@ -131,6 +131,8 @@ const createFacultyIntoDB = async (
     throw new AppError(404, 'Academic Department not found');
   }
 
+  payload.academicFaculty = academicDepartment.academicFaculty
+
   // transaction rollback
   const session = await mongoose.startSession();
 
