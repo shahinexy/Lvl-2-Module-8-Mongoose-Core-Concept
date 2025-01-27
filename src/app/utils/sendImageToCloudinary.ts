@@ -3,7 +3,10 @@ import config from '../config';
 import multer from 'multer';
 import fs from 'fs';
 
-export const sendImageToCloudinary = async (path: string, fileName: string) => {
+export const sendImageToCloudinary = async (
+  path: string,
+  fileName: string,
+): Promise<Record<string, unknown>> => {
   // Configuration
   cloudinary.config({
     cloud_name: config.cloudinary_cloud_name,

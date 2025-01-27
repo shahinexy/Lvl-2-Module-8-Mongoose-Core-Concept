@@ -33,9 +33,9 @@ export type Student = {
   profileImg: string;
   admissionSemester: Types.ObjectId;
   academicDepartment: Types.ObjectId;
+  academicFaculty: Types.ObjectId;
   isDeleted: boolean;
 };
-
 
 // Create a custom instance method
 // export type StudentMethods = {
@@ -44,10 +44,7 @@ export type Student = {
 
 // export type ModelOfStudent = Model<Student, Record<string, never>, StudentMethods>;
 
-
-
-
 // Create a custom statics method
 export interface ModelOfStudent extends Model<Student> {
-  isUserExists(id: string) : Promise<Student | null>
+  isUserExists(id: string): Promise<Student | null>;
 }

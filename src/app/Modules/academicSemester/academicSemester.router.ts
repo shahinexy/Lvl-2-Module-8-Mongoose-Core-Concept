@@ -2,11 +2,13 @@ import express from 'express';
 import { AcademicSemesterControllers } from './academicSemester.controller';
 import valideteRequest from '../../middlwares/validetRequest';
 import { AcademicSemesterValidationSchema } from './academicSemester.validation';
+import auth from '../../middlwares/auth';
 
 const router = express.Router();
 
 router.post(
   '/create-academic-semesters',
+  auth('superAdmin', 'admin'),
   valideteRequest(
     AcademicSemesterValidationSchema.createAcademicSemesterValidationSchema,
   ),

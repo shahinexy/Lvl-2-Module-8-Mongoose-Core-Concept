@@ -6,7 +6,6 @@ import valideteRequest from '../../middlwares/validetRequest';
 import { facultyValidations } from '../faculty/faculty.validation';
 import { AdminValidations } from '../admin/admin.validation';
 import auth from '../../middlwares/auth';
-import { USER_ROLE } from './user.constant';
 import { UserValidation } from './user.validation';
 import { upload } from '../../utils/sendImageToCloudinary';
 
@@ -14,11 +13,11 @@ const router = express.Router();
 
 router.post(
   '/create-student',
-  auth(USER_ROLE.admin),
+  auth('superAdmin', 'admin'),
   upload.single('file'),
-  (req: Request, res: Response, next: NextFunction)=>{
-    req.body = JSON.parse(req.body.data)
-    next()
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = JSON.parse(req.body.data);
+    next();
   },
   valideteRequest(studentValidations.createStudentValidationSchema),
   UsreControllers.createStudent,
@@ -26,25 +25,29 @@ router.post(
 
 router.post(
   '/create-faculty',
-  auth(USER_ROLE.admin),
+  auth('superAdmin', 'admin'),
   valideteRequest(facultyValidations.createFacultyValidationSchema),
   UsreControllers.createFaculty,
 );
 
 router.post(
   '/create-admin',
-  // auth(USER_ROLE.admin),
+  auth('superAdmin'),
   valideteRequest(AdminValidations.createAdminValidationSchema),
   UsreControllers.createAdmin,
 );
 
 router.post(
   '/change-status/:id',
-  auth('admin'),
+  auth('superAdmin', 'admin'),
   valideteRequest(UserValidation.changeStatusValidationSchema),
   UsreControllers.changeStatus,
 );
 
-router.get('/me', auth('student', 'faculty', 'admin'), UsreControllers.getMe);
+router.get(
+  '/me',
+  auth('superAdmin', 'student', 'faculty', 'admin'),
+  UsreControllers.getMe,
+);
 
 export const UserRouters = router;
