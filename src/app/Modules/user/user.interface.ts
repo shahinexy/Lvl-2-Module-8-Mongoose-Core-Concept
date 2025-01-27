@@ -7,17 +7,17 @@ export type TUser = {
   password: string;
   needsPasswordChange: boolean;
   passwordChangedAt?: Date;
-  role: 'admin' | 'student' | 'faculty';
+  role: 'super-admin' | 'admin' | 'student' | 'faculty';
   status: 'in-progress' | 'blocked';
   isDeleted: boolean;
 };
 
 // Create a custom statics method
 export interface ModelOfUser extends Model<TUser> {
-    isJwtIssuedBeforePasswordChanged(
-      passwordChangedTimestamp: Date,
-      jwtIssuedTimestamp: number,
-    ): boolean;
-  }
+  isJwtIssuedBeforePasswordChanged(
+    passwordChangedTimestamp: Date,
+    jwtIssuedTimestamp: number,
+  ): boolean;
+}
 
 export type TUserRole = keyof typeof USER_ROLE;
