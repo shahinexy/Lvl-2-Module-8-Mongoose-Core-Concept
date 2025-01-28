@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import mongoose from 'mongoose';
 import AppError from '../../error/AppError';
 import { TCourse, TCoursefaculty } from './course.interface';
@@ -142,6 +143,13 @@ const assignFacultyWithCourseIntoDB = async (
   return result;
 };
 
+const getFacultyWithCourse = async (courseId: string) => {
+  const result = await CourseFacultyModel.findOne({
+    course: courseId,
+  }).populate('faculties');
+  return result;
+};
+
 const removeFacultyFromCourseFromDB = async (
   id: string,
   payload: TCoursefaculty,
@@ -165,5 +173,6 @@ export const CourseServices = {
   updateCourseInToDB,
   deleteCourseFromDB,
   assignFacultyWithCourseIntoDB,
+  getFacultyWithCourse,
   removeFacultyFromCourseFromDB,
 };

@@ -44,6 +44,12 @@ router.put(
   CourseControllers.assignFacultyWithCourse,
 );
 
+router.get(
+  '/:courseId/get-faculties',
+  auth('superAdmin', 'admin', 'faculty', 'student'),
+  CourseControllers.getFacultyWithCourse,
+);
+
 router.delete(
   '/:courseId/remove-faculties',
   auth('superAdmin', 'admin'),
