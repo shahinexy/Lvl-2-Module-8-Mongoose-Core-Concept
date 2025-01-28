@@ -16,7 +16,7 @@ router.post(
 
 router.patch(
   '/update-enrolled-course-marks',
-  auth('faculty'),
+  auth('superAdmin', 'admin', 'faculty'),
   valideteRequest(
     EnrolledCourseValidations.createEnrolledCourseValidationZodSchema,
   ),

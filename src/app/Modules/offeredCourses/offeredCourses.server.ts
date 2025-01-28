@@ -1,9 +1,12 @@
+import status from 'http-status';
+import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/AppError';
 import { AcademicDepartmentModel } from '../academicDepartment/academicDepartment.model';
 import { AcademicFacultyModel } from '../academicFaculty/academicFaculty.model';
 import { CourseModel } from '../course/course.model';
 import { FacultyModel } from '../faculty/faculty.model';
 import { SemesterRegistrationModel } from '../semesterRegestration/semesterRegistration.model';
+import { StudentModle } from '../student/student.model';
 import { TOfferedCourse } from './offeredCourses.interface';
 import { OfferedCourseModel } from './offeredCourses.model';
 import { hasTimeConflict } from './offeredCourses.utils';
@@ -111,14 +114,34 @@ const createOfferedCourseInDB = async (payload: TOfferedCourse) => {
   return result;
 };
 
-const getAllOfferedCourseFromDB = async () => {
-  const result = await OfferedCourseModel.find();
-  return result;
+const getAllOfferedCourseFromDB = async (query: Record<string, unknown>) => {
+  const courseQuery = new QueryBuilder(OfferedCourseModel.find(), query)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const meta = await courseQuery.cuntTotal();
+  const result = await courseQuery.modelQuery;
+  return { meta, result };
 };
 
 const getSingleOfferedCourseFromDB = async (id: string) => {
   const result = await OfferedCourseModel.findById(id);
   return result;
+};
+
+const getMyOfferedCourseFromDB = async (userId: string) => {
+  const student = await StudentModle.findOne({ id: userId });
+
+  if (!student) {
+    throw new AppError(status.NOT_FOUND, 'User not found');
+  }
+
+  const currentOngoingSemester = await SemesterRegistrationModel.findOne({
+    status: 'ONGOING',
+  });
+  return currentOngoingSemester;
 };
 
 const updateSingleOfferedCourseFromDB = async (
@@ -184,10 +207,15 @@ const deleteOfferedCourseFromDB = async (id: string) => {
     throw new AppError(404, 'Offered Course Not Found');
   }
 
-  const semesterRegistration = await SemesterRegistrationModel.findById(isOfferedCourseExists.semesterRegistration)
+  const semesterRegistration = await SemesterRegistrationModel.findById(
+    isOfferedCourseExists.semesterRegistration,
+  );
 
-  if(semesterRegistration?.status !== "UPCOMING"){
-    throw new AppError(400, `Offered course can not update ! because the semester ${semesterRegistration?.status}`);
+  if (semesterRegistration?.status !== 'UPCOMING') {
+    throw new AppError(
+      400,
+      `Offered course can not update ! because the semester ${semesterRegistration?.status}`,
+    );
   }
 
   const result = await OfferedCourseModel.findByIdAndDelete(id);
@@ -198,6 +226,7 @@ export const OfferedCourseServices = {
   createOfferedCourseInDB,
   getAllOfferedCourseFromDB,
   getSingleOfferedCourseFromDB,
+  getMyOfferedCourseFromDB,
   updateSingleOfferedCourseFromDB,
-  deleteOfferedCourseFromDB
+  deleteOfferedCourseFromDB,
 };
