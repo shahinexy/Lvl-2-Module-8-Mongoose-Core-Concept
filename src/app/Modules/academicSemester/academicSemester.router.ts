@@ -15,20 +15,21 @@ router.post(
   AcademicSemesterControllers.createAcademicSemester,
 );
 
-router.get('/', AcademicSemesterControllers.getAllAcademicSemester);
-
 router.get(
-  '/:semesterId',
-  AcademicSemesterControllers.getSingleAcademicSemester,
+  '/',
+  auth('superAdmin', 'admin', 'faculty', 'student'),
+  AcademicSemesterControllers.getAllAcademicSemester,
 );
 
 router.get(
   '/:semesterId',
+  auth('superAdmin', 'admin', 'faculty', 'student'),
   AcademicSemesterControllers.getSingleAcademicSemester,
 );
 
 router.patch(
   '/:semesterId',
+  auth('superAdmin', 'admin'),
   valideteRequest(
     AcademicSemesterValidationSchema.updateAcademicSemesterValidationSchema,
   ),

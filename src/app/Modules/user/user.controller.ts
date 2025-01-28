@@ -1,6 +1,7 @@
 import { UserServices } from './user.server';
 import sendResponse from '../../utils/sendResponse';
 import catchAsync from '../../utils/catchAsync';
+import { JwtPayload } from 'jsonwebtoken';
 
 const createStudent = catchAsync(async (req, res) => {
   const { password, student: studentData } = req.body;
@@ -20,7 +21,6 @@ const createStudent = catchAsync(async (req, res) => {
 });
 
 const createFaculty = catchAsync(async (req, res) => {
-  console.log(req.body, req.file);
   const { password, faculty: facultyData } = req.body;
   const result = await UserServices.createFacultyIntoDB(
     req.file,
@@ -67,7 +67,7 @@ const changeStatus = catchAsync(async (req, res) => {
 });
 
 const getMe = catchAsync(async (req, res) => {
-  const { userId, role } = req.user;
+  const { userId, role } = req.user as JwtPayload;
 
   const result = await UserServices.getMe(userId, role);
 
