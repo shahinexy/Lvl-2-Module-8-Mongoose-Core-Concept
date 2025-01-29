@@ -40,7 +40,7 @@ const courseMarksSchema = new Schema<TEnrolledCourseMarks>(
 const enrolledCourseSchema = new Schema<TEnrolledCourse>({
   semesterRegistration: {
     type: Schema.Types.ObjectId,
-    ref: 'SemesterRegistration',
+    ref: 'SemesterRegestration',
     required: true,
   },
   academicSemester: {

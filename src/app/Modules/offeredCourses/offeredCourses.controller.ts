@@ -36,7 +36,7 @@ const getSingleOfferedCourses = catchAsync(async (req, res) => {
 
 const getMyOfferedCourse = catchAsync(async (req, res) => {
   const {userId} = req.user as JwtPayload;
-    const result = await OfferedCourseServices.getMyOfferedCourseFromDB(userId)
+    const result = await OfferedCourseServices.getMyOfferedCourseFromDB(userId, req.query)
     sendResponse(res, {
       statusCode: 200,
       success: true,
