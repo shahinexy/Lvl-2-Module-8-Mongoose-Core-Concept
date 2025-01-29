@@ -1,4 +1,4 @@
-import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import config from '../config';
 import multer from 'multer';
 import fs from 'fs';
@@ -33,7 +33,7 @@ export const sendImageToCloudinary = async (
   });
 
   //   console.log(uploadResult);
-  return uploadResult;
+  return uploadResult as UploadApiResponse;
 };
 
 // multer
