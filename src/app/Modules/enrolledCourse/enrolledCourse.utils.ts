@@ -26,7 +26,7 @@ export const calculateGratePoints = (totalMarks: number) => {
     };
   } else if (totalMarks >= 80 && totalMarks <= 100) {
     result = {
-      grade: '4',
+      grade: 'A',
       gradePoint: 4.0,
     };
   } else {

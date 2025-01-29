@@ -141,7 +141,83 @@ const getMyOfferedCourseFromDB = async (userId: string) => {
   const currentOngoingSemester = await SemesterRegistrationModel.findOne({
     status: 'ONGOING',
   });
-  return currentOngoingSemester;
+
+  if (!currentOngoingSemester) {
+    throw new AppError(status.NOT_FOUND, 'No Ongoing Semester Found');
+  }
+  console.log(student._id, currentOngoingSemester._id);
+  const result = await OfferedCourseModel.aggregate([
+    {
+      $match: {
+        semesterRegistration: currentOngoingSemester._id,
+        academicFaculty: student.academicFaculty,
+        academicDepartment: student.academicDepartment,
+      },
+    },
+    {
+      $lookup: {
+        from: 'courses',
+        localField: 'course',
+        foreignField: '_id',
+        as: 'course',
+      },
+    },
+    {
+      $unwind: '$course',
+    },
+    {
+      $lookup: {
+        from: 'enrolledcourses',
+        let: {
+          currentOngoingSemester: currentOngoingSemester._id,
+          currentStudent: student._id,
+        },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  {
+                    $eq: ['$semesterRegistration', '$$currentOngoingSemester'],
+                  },
+                  {
+                    $eq: ['$student', '$$currentStudent'],
+                  },
+                  {
+                    $eq: ['$isEnrolled', true],
+                  },
+                ],
+              },
+            },
+          },
+        ],
+        as: 'enrolledcourses',
+      },
+    },
+    {
+      $addFields: {
+        isAlreadyEnrolled: {
+          $in: [
+            '$course._id',
+            {
+              $map: {
+                input: '$enrolledcourses',
+                as: 'enroll',
+                in: '$$enroll.course',
+              },
+            },
+          ],
+        },
+      },
+    },
+    {
+      $match: {
+        isAlreadyEnrolled: false,
+      },
+    },
+  ]);
+
+  return result;
 };
 
 const updateSingleOfferedCourseFromDB = async (

@@ -27,7 +27,7 @@ const updateEnrolledCourseMarksIntoDB = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: 'Student is enrolled succesfully',
+    message: 'Mark updated succesfully',
     data: result,
   });
 });
