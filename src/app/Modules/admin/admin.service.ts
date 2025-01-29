@@ -1,5 +1,4 @@
-
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // ========= route -> controller -> service ==========
 import mongoose from 'mongoose';
 import AppError from '../../error/AppError';
@@ -11,10 +10,7 @@ import QueryBuilder from '../../builder/QueryBuilder';
 const getAllAdminsFronDB = async (query: Record<string, unknown>) => {
   const AdminSearchbleField = ['email', 'name.firstName', 'designation'];
 
-  const AdminQuery = new QueryBuilder(
-    AdminModel.find(),
-    query
-  )
+  const AdminQuery = new QueryBuilder(AdminModel.find(), query)
     .search(AdminSearchbleField)
     .filter()
     .sort()
@@ -22,16 +18,15 @@ const getAllAdminsFronDB = async (query: Record<string, unknown>) => {
     .fields();
 
   const result = await AdminQuery.modelQuery;
+  const meta = await AdminQuery.cuntTotal();
 
-  return result;
+  return { meta, result };
 };
 
 const getSingleAdminFromDB = async (id: string) => {
-  const result = await AdminModel.findById( id )
+  const result = await AdminModel.findById(id);
   return result;
 };
-
-
 
 const updateAdminInDB = async (id: string, payload: Partial<TAdmin>) => {
   const { name, ...remainingAdmintData } = payload;
@@ -46,14 +41,10 @@ const updateAdminInDB = async (id: string, payload: Partial<TAdmin>) => {
     }
   }
 
-  const result = await AdminModel.findByIdAndUpdate(
-     id,
-    modifiedUpdatedData,
-    {
-      new: true,
-      runValidators: true,
-    },
-  );
+  const result = await AdminModel.findByIdAndUpdate(id, modifiedUpdatedData, {
+    new: true,
+    runValidators: true,
+  });
   return result;
 };
 
@@ -71,7 +62,7 @@ const deleteAdminFromDB = async (id: string) => {
     session.startTransaction();
 
     const deleteAdmint = await AdminModel.findByIdAndUpdate(
-       id,
+      id,
       { isDeleted: true },
       { new: true, session },
     );

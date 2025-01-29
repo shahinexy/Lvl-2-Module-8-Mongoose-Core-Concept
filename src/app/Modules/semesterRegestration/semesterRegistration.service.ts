@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import mongoose from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/AppError';
@@ -61,7 +62,9 @@ const getAllSemesterRegistersFromDB = async (
     .fields();
 
   const result = await semesterRegistrationQuery.modelQuery;
-  return result;
+  const meta = await semesterRegistrationQuery.cuntTotal();
+
+  return { meta, result };
 };
 
 const getSingleSemesterRegistersFromDB = async (id: string) => {

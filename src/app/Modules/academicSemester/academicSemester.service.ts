@@ -1,3 +1,4 @@
+import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/AppError';
 import { semesterNameCodeMapper } from './academicSemester.constant';
 import { TAcademicSemester } from './academicSemester.inferface';
@@ -11,30 +12,50 @@ const createAcademicSemesterInDB = async (payload: TAcademicSemester) => {
   return result;
 };
 
-const getAllAcademicSemesterFromDB = async () =>{
-    const result = await AcademicSemesterModel.find();
-    return result;
-}
+const getAllAcademicSemesterFromDB = async (query: Record<string, unknown>) => {
+  const academicSemesterQuery = new QueryBuilder(
+    AcademicSemesterModel.find(),
+    query,
+  )
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
 
-const getSingleAcademicSemesterFromDB = async (semesterId: string) =>{
-    const result = await AcademicSemesterModel.findOne({_id: semesterId});
-    return result;
-}
+  const result = await academicSemesterQuery.modelQuery;
+  const meta = await academicSemesterQuery.cuntTotal();
 
-const updateSingleAcademicSemesterFromDB = async (semesterId: string, payload: Partial<TAcademicSemester>) =>{
+  return { meta, result };
+};
 
-  if(payload.name && payload.code && semesterNameCodeMapper[payload.name] !== payload.code){
-    throw new AppError(404, 'Invalid Semester Code')
+const getSingleAcademicSemesterFromDB = async (semesterId: string) => {
+  const result = await AcademicSemesterModel.findOne({ _id: semesterId });
+  return result;
+};
+
+const updateSingleAcademicSemesterFromDB = async (
+  semesterId: string,
+  payload: Partial<TAcademicSemester>,
+) => {
+  if (
+    payload.name &&
+    payload.code &&
+    semesterNameCodeMapper[payload.name] !== payload.code
+  ) {
+    throw new AppError(404, 'Invalid Semester Code');
   }
 
-  const result = await AcademicSemesterModel.findOneAndUpdate({_id: semesterId}, {$set: payload}, {new: true})
+  const result = await AcademicSemesterModel.findOneAndUpdate(
+    { _id: semesterId },
+    { $set: payload },
+    { new: true },
+  );
   return result;
-}
-
+};
 
 export const AcademicSemesterServices = {
   createAcademicSemesterInDB,
   getAllAcademicSemesterFromDB,
   getSingleAcademicSemesterFromDB,
-  updateSingleAcademicSemesterFromDB
+  updateSingleAcademicSemesterFromDB,
 };

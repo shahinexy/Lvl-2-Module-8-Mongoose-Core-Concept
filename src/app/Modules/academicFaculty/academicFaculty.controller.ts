@@ -17,12 +17,13 @@ const createAcademicFaculty = catchAsync(async (req, res) => {
 });
 
 const getAllAcademicFaculty = catchAsync(async (req, res)=>{
-    const result = await AcademicFacultyServices.getAllAcademicFacultyFromDB()
+    const result = await AcademicFacultyServices.getAllAcademicFacultyFromDB(req.query)
     sendResponse(res, {
         statusCode: 200,
         success: true,
         message: 'All Academic Faculty get successfully',
-        data: result,
+        meta: result.meta,
+        data: result.result,
       });
 })
 

@@ -2,6 +2,7 @@ import status from 'http-status';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import { EnrolledCourseServices } from './enrolledCourse.service';
+import { JwtPayload } from 'jsonwebtoken';
 
 const createEnrolledCourse = catchAsync(async (req, res) => {
   const userId = req.user?.userId;
@@ -19,10 +20,10 @@ const createEnrolledCourse = catchAsync(async (req, res) => {
 });
 
 const getMyEnrolledCourses = catchAsync(async (req, res) => {
-  const studentId = req.user.userId;
+  const {userId} = req.user as JwtPayload;
 
   const result = await EnrolledCourseServices.getMyEnrolledCoursesFromDB(
-    studentId,
+    userId,
     req.query,
   );
 

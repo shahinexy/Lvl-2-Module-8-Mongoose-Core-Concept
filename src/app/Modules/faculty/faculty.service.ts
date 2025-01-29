@@ -1,5 +1,3 @@
-
-
 // ========= route -> controller -> service ==========
 import mongoose from 'mongoose';
 import AppError from '../../error/AppError';
@@ -11,10 +9,7 @@ import QueryBuilder from '../../builder/QueryBuilder';
 const getAllFacultysFronDB = async (query: Record<string, unknown>) => {
   const facultySearchbleField = ['email', 'name.firstName', 'designation'];
 
-  const facultyQuery = new QueryBuilder(
-    FacultyModel.find(),
-    query
-  )
+  const facultyQuery = new QueryBuilder(FacultyModel.find(), query)
     .search(facultySearchbleField)
     .filter()
     .sort()
@@ -22,12 +17,13 @@ const getAllFacultysFronDB = async (query: Record<string, unknown>) => {
     .fields();
 
   const result = await facultyQuery.modelQuery;
+  const meta = await facultyQuery.cuntTotal();
 
-  return result;
+  return { meta, result };
 };
 
 const getSingleFacultyFromDB = async (id: string) => {
-  const result = await FacultyModel.findById( id )
+  const result = await FacultyModel.findById(id);
   return result;
 };
 
@@ -44,14 +40,10 @@ const updateFacultyInDB = async (id: string, payload: Partial<TFaculty>) => {
     }
   }
 
-  const result = await FacultyModel.findByIdAndUpdate(
-     id,
-    modifiedUpdatedData,
-    {
-      new: true,
-      runValidators: true,
-    },
-  );
+  const result = await FacultyModel.findByIdAndUpdate(id, modifiedUpdatedData, {
+    new: true,
+    runValidators: true,
+  });
   return result;
 };
 
@@ -69,7 +61,7 @@ const deleteFacultyFromDB = async (id: string) => {
     session.startTransaction();
 
     const deleteFacultyt = await FacultyModel.findByIdAndUpdate(
-       id,
+      id,
       { isDeleted: true },
       { new: true, session },
     );
